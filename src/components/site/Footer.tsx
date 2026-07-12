@@ -54,9 +54,15 @@ export function Footer() {
             <h3 className="mb-2 font-display text-xs font-bold uppercase tracking-[0.3em] text-aqua">
               Connect
             </h3>
-            {["Groups", "Sunday Gatherings", "Baptism", "Events", "Serve"].map((l) => (
-              <a key={l} href="#connect" className="w-fit transition-colors hover:text-cream">
-                {l}
+            {[
+              { label: "Groups", href: "/#community" },
+              { label: "Sunday Gatherings", href: "/#sundays" },
+              { label: "Baptism", href: "/#connect" },
+              { label: "Events", href: "/events" },
+              { label: "Serve", href: "/#connect" },
+            ].map((l) => (
+              <a key={l.label} href={l.href} className="w-fit transition-colors hover:text-cream">
+                {l.label}
               </a>
             ))}
           </nav>

@@ -22,7 +22,7 @@ const NAV: { label: string; children: { label: string; href: string }[] }[] = [
       { label: "H2O Apparel", href: "/#connect" },
     ],
   },
-  { label: "Events", children: [{ label: "Upcoming Events", href: "/#connect" }] },
+  { label: "Events", children: [{ label: "Upcoming Events", href: "/events" }] },
   {
     label: "Serve",
     children: [
