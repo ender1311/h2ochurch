@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { siteUrl } from "@/lib/site";
 
 const ROLES = ["admin", "staff", "leader", "member"] as const;
 
@@ -17,7 +18,9 @@ export async function inviteUser(fd: FormData) {
   if (!email) throw new Error("Email is required");
 
   const supabase = createAdminClient();
-  const { data, error } = await supabase.auth.admin.inviteUserByEmail(email);
+  const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
+    redirectTo: `${siteUrl()}/account/set-password`,
+  });
   if (error) throw new Error(error.message);
 
   if (data.user) {
