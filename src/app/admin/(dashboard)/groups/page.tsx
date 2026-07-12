@@ -14,12 +14,20 @@ export default async function GroupsPage() {
           <h1 className="font-display text-4xl font-extrabold text-ink">Groups</h1>
           <p className="mt-1 text-ink/60">{groups.length} groups</p>
         </div>
-        <a
-          href="/admin/groups/export"
-          className="rounded-full border border-ink/15 px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-ink transition-colors hover:border-brand hover:text-brand"
-        >
-          Export CSV
-        </a>
+        <div className="flex items-center gap-3">
+          <a
+            href="/admin/groups/export"
+            className="rounded-full border border-ink/15 px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-ink transition-colors hover:border-brand hover:text-brand"
+          >
+            Export CSV
+          </a>
+          <Link
+            href="/admin/groups/new"
+            className="rounded-full bg-brand px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-cream transition-colors hover:bg-water"
+          >
+            + New
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

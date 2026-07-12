@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPersonWithGroups } from "@/lib/cms/queries";
+import { deletePerson } from "@/lib/cms/actions/people";
+import { DeleteButton } from "@/components/admin/DeleteButton";
 
 export const dynamic = "force-dynamic";
 
@@ -10,12 +12,24 @@ export default async function PersonPage({ params }: { params: Promise<{ id: str
   if (!person) notFound();
 
   const initials = `${person.first_name[0] ?? ""}${person.last_name[0] ?? ""}`;
+  const remove = deletePerson.bind(null, id);
 
   return (
     <div>
-      <Link href="/admin/people" className="text-sm font-semibold text-ink/50 hover:text-brand">
-        ← Back to people
-      </Link>
+      <div className="flex items-center justify-between gap-4">
+        <Link href="/admin/people" className="text-sm font-semibold text-ink/50 hover:text-brand">
+          ← Back to people
+        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/admin/people/${id}/edit`}
+            className="rounded-full border border-ink/15 px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-ink transition-colors hover:border-brand hover:text-brand"
+          >
+            Edit
+          </Link>
+          <DeleteButton action={remove} label="Delete" confirm={`Delete ${person.first_name} ${person.last_name}?`} />
+        </div>
+      </div>
 
       <div className="mt-6 flex items-center gap-5">
         <span
