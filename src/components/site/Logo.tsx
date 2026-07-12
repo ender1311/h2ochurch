@@ -4,23 +4,16 @@ type LogoProps = {
 };
 
 export function Logo({ className = "", tone = "dark" }: LogoProps) {
-  const text = tone === "light" ? "text-cream" : "text-ink";
-  const sub = tone === "light" ? "text-aqua" : "text-brand";
+  const text = tone === "light" ? "text-white" : "text-ink";
+  const sub = tone === "light" ? "text-white/80" : "text-ink/60";
 
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className}`}>
-      <Droplet className="h-7 w-7 shrink-0" tone={tone} />
-      <span className="flex flex-col leading-none">
-        <span className={`font-display text-2xl font-extrabold tracking-tight ${text}`}>
-          H<span className={sub}>2</span>O
-        </span>
-        <span
-          className={`text-[0.55rem] font-semibold uppercase tracking-[0.42em] ${
-            tone === "light" ? "text-foam/70" : "text-ink/50"
-          }`}
-        >
-          Church
-        </span>
+    <span className={`inline-flex flex-col items-center leading-none ${className}`}>
+      <span className={`font-display text-3xl font-bold tracking-tight ${text}`}>
+        H<span className="align-baseline text-[0.7em]">2</span>O
+      </span>
+      <span className={`mt-1 text-[0.6rem] font-medium uppercase tracking-[0.55em] ${sub}`}>
+        Church
       </span>
     </span>
   );

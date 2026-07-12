@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Instrument_Sans, Fraunces } from "next/font/google";
+import { Montserrat, Fraunces } from "next/font/google";
 import "./globals.css";
 
-const display = Bricolage_Grotesque({
+const montserrat = Montserrat({
   variable: "--font-display",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
 });
 
-const sans = Instrument_Sans({
+const sans = Montserrat({
   variable: "--font-sans",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
 });
 
 const serif = Fraunces({
@@ -34,7 +35,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${display.variable} ${sans.variable} ${serif.variable} antialiased`}
+      className={`${montserrat.variable} ${sans.variable} ${serif.variable} antialiased`}
     >
       <body>{children}</body>
     </html>

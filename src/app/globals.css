@@ -1,19 +1,20 @@
 @import "tailwindcss";
 
-/* ── H2O "living water" design tokens ─────────────────────────────── */
+/* ── H2O design tokens (matched to h2ocolumbus.org) ───────────────── */
 :root {
-  --abyss: #041c28;
-  --ink: #06212e;
-  --deep: #0b3a52;
-  --brand: #0e6ba0;
-  --water: #1e9bd7;
-  --aqua: #58cfe4;
-  --foam: #d9f2f7;
+  --abyss: #2b333c;
+  --ink: #3b434d;
+  --slate: #434b56;
+  --deep: #1d6fa5;
+  --brand: #2379b6;
+  --water: #2e86c4;
+  --aqua: #4aa3d6;
+  --foam: #dbeaf5;
 
-  --paper: #f4efe4;
-  --sand: #e9e0cf;
-  --cream: #fbf8f1;
-  --charcoal: #14232b;
+  --paper: #ffffff;
+  --sand: #f2f5f8;
+  --cream: #ffffff;
+  --charcoal: #2b333c;
 
   --background: var(--paper);
   --foreground: var(--ink);
@@ -22,6 +23,7 @@
 @theme inline {
   --color-abyss: var(--abyss);
   --color-ink: var(--ink);
+  --color-slate: var(--slate);
   --color-deep: var(--deep);
   --color-brand: var(--brand);
   --color-water: var(--water);
@@ -59,17 +61,6 @@ body {
 ::selection {
   background: var(--water);
   color: var(--cream);
-}
-
-/* Subtle paper grain overlay for the whole page */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* ── Keyframes ─────────────────────────────────────────────────────── */
