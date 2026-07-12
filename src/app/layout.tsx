@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Instrument_Sans, Fraunces } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/site/Header";
-import { Footer } from "@/components/site/Footer";
 
 const display = Bricolage_Grotesque({
   variable: "--font-display",
@@ -38,11 +36,7 @@ export default function RootLayout({
       lang="en"
       className={`${display.variable} ${sans.variable} ${serif.variable} antialiased`}
     >
-      <body>
-        <Header />
-        {children}
-        <Footer />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
