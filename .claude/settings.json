@@ -1,0 +1,34 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "REPO=$(git rev-parse --show-toplevel 2>/dev/null) && bash \"$REPO/.claude/test-coverage-check.sh\"",
+            "timeout": 10,
+            "statusMessage": "Checking test coverage..."
+          },
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.file_path // .tool_response.filePath // empty' | { read -r f; [[ \"$f\" =~ \\.(ts|tsx)$ ]] && bunx eslint --fix \"$f\" 2>/dev/null || true; } 2>/dev/null || true",
+            "statusMessage": "ESLint auto-fix..."
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "Review this H2O Church web app development session for learnable patterns:\n1. Run: git -C /Users/danluk/projects/h2ochurch log --oneline origin/main..HEAD 2>/dev/null | head -10\n2. Run: git -C /Users/danluk/projects/h2ochurch diff origin/main...HEAD --stat 2>/dev/null | head -30\n3. Read: /Users/danluk/.claude/projects/-Users-danluk-projects-h2ochurch/memory/MEMORY.md\n\nIdentify NON-OBVIOUS learnings (codebase patterns, API quirks, performance pitfalls, surprising behaviors, deployment gotchas) not already in memory. If found, write them as memory files at /Users/danluk/.claude/projects/-Users-danluk-projects-h2ochurch/memory/ using frontmatter format (---\\nname: ...\\ndescription: ...\\nmetadata:\\n  type: feedback|project|reference\\n---\\n<body with Why: and How to apply: lines>), then add pointer lines to MEMORY.md.\n\nBe highly selective — only save what prevents a real mistake or saves significant time in future sessions. If nothing genuinely new, output 'No new learnings this session.'",
+            "timeout": 90,
+            "statusMessage": "Capturing session learnings..."
+          }
+        ]
+      }
+    ]
+  }
+}
