@@ -1,22 +1,16 @@
-import { Header } from "@/components/site/Header";
-import { Footer } from "@/components/site/Footer";
 import { Droplet } from "@/components/site/Logo";
 import { Reveal } from "@/components/Reveal";
 
 export default function Home() {
   return (
-    <>
-      <Header />
-      <main id="top">
-        <Hero />
-        <FeatureCards />
-        <Mission />
-        <CurrentSeries />
-        <Different />
-        <ConnectCTA />
-      </main>
-      <Footer />
-    </>
+    <main id="top">
+      <Hero />
+      <FeatureCards />
+      <Mission />
+      <CurrentSeries />
+      <Different />
+      <ConnectCTA />
+    </main>
   );
 }
 
