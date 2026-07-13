@@ -17,6 +17,12 @@ const TABLES = [
   "calendar_events",
   "households",
   "profiles",
+  "songs",
+  "teams",
+  "team_members",
+  "service_plans",
+  "plan_items",
+  "plan_assignments",
 ];
 
 describe.skipIf(!hasDbEnv())("RLS lockdown (anon key)", () => {

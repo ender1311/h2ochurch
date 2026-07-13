@@ -87,7 +87,11 @@ export async function registerForEvent(eventId: string, slug: string, fd: FormDa
 
   // Capacity → waitlist behavior.
   const [{ data: event }, { count: activeCount }] = await Promise.all([
-    supabase.from("events").select("capacity, registration_open").eq("id", eventId).single(),
+    supabase
+      .from("events")
+      .select("name, capacity, cost_cents, registration_open")
+      .eq("id", eventId)
+      .single(),
     supabase
       .from("event_registrations")
       .select("*", { count: "exact", head: true })
@@ -97,17 +101,35 @@ export async function registerForEvent(eventId: string, slug: string, fd: FormDa
   if (!event?.registration_open) throw new Error("Registration is closed");
   const status = decideRegistrationStatus(event.capacity, activeCount ?? 0);
 
-  const { error } = await supabase.from("event_registrations").insert({
-    event_id: eventId,
-    person_id: personId,
-    first_name: first,
-    last_name: last,
-    email: email?.toLowerCase() ?? null,
-    phone: nullable(fd, "phone"),
-    responses: { notes: str(fd, "notes") },
-    status,
-  });
-  if (error) throw new Error(error.message);
+  const { data: registration, error } = await supabase
+    .from("event_registrations")
+    .insert({
+      event_id: eventId,
+      person_id: personId,
+      first_name: first,
+      last_name: last,
+      email: email?.toLowerCase() ?? null,
+      phone: nullable(fd, "phone"),
+      responses: { notes: str(fd, "notes") },
+      status,
+    })
+    .select("id")
+    .single();
+  if (error || !registration) throw new Error(error?.message ?? "Registration failed");
   revalidatePath(`/admin/events/${eventId}`);
+
+  // Paid event → hand off to Stripe Checkout (skipped for waitlist or when unconfigured).
+  if (event.cost_cents > 0 && status === "registered") {
+    const { startRegistrationCheckout } = await import("@/lib/payments/checkout");
+    const url = await startRegistrationCheckout({
+      registrationId: registration.id,
+      eventName: event.name,
+      slug,
+      costCents: event.cost_cents,
+      email: email?.toLowerCase() ?? null,
+    });
+    if (url) redirect(url);
+  }
+
   redirect(`/events/${slug}?registered=${status === "waitlisted" ? "waitlist" : "1"}`);
 }

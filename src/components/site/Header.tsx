@@ -32,7 +32,7 @@ const NAV: { label: string; children: { label: string; href: string }[] }[] = [
       { label: "Internship Program", href: "/#connect" },
     ],
   },
-  { label: "Give", children: [{ label: "Give Online", href: "/#give" }] },
+  { label: "Give", children: [{ label: "Give Online", href: "/give" }] },
 ];
 
 export function Header() {

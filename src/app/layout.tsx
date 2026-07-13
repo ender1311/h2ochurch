@@ -25,6 +25,18 @@ export const metadata: Metadata = {
   title: "H2O Church — A Campus Church at Ohio State",
   description:
     "H2O is a local church committed to cultivating a Christlike community at Ohio State to grow His kingdom wherever we go. Columbus, OH.",
+  appleWebApp: {
+    capable: true,
+    title: "H2O Church",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    apple: "/icons/apple-icon.png",
+  },
+};
+
+export const viewport = {
+  themeColor: "#434b56",
 };
 
 export default function RootLayout({

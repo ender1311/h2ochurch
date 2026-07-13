@@ -41,6 +41,12 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
           ← Back to check-ins
         </Link>
         <div className="flex items-center gap-3">
+          <Link
+            href={`/admin/labels/${id}`}
+            className="rounded-full bg-brand px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-cream transition-colors hover:bg-water"
+          >
+            Print name tags
+          </Link>
           <a
             href={`/admin/checkins/${id}/export`}
             className="rounded-full border border-ink/15 px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-ink transition-colors hover:border-brand hover:text-brand"

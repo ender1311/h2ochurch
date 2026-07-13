@@ -8,6 +8,7 @@ const NAV = [
   { label: "People", href: "/admin/people", icon: "M8 11a3 3 0 100-6 3 3 0 000 6zm8 0a3 3 0 100-6 3 3 0 000 6zM2 20c0-3 2.5-5 6-5s6 2 6 5M14 20c0-2.5 1.8-4.2 4-4.2s4 1.7 4 4.2" },
   { label: "Groups", href: "/admin/groups", icon: "M4 6h16M4 12h16M4 18h10" },
   { label: "Events", href: "/admin/events", icon: "M4 5h16v16H4zM4 9h16M8 3v4M16 3v4" },
+  { label: "Services", href: "/admin/services", icon: "M9 18V6l10-2v12M9 18a3 3 0 11-6 0 3 3 0 016 0zm10-2a3 3 0 11-6 0 3 3 0 016 0z" },
   { label: "Giving", href: "/admin/giving", icon: "M12 3v18M8 7h6a2.5 2.5 0 010 5H8m0 0h7a2.5 2.5 0 010 5H7" },
   { label: "Check-Ins", href: "/admin/checkins", icon: "M9 11l3 3 8-8M4 12v6a2 2 0 002 2h12" },
   { label: "Calendar", href: "/admin/calendar", icon: "M4 5h16v16H4zM4 9h16M8 3v4M16 3v4" },
