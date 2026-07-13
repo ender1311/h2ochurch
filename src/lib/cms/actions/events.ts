@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/auth";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { slugify } from "@/lib/cms/slug";
+import { decideRegistrationStatus } from "@/lib/cms/registration";
 
 function str(fd: FormData, key: string): string {
   return (fd.get(key) as string | null)?.trim() ?? "";
@@ -11,9 +13,6 @@ function str(fd: FormData, key: string): string {
 function nullable(fd: FormData, key: string): string | null {
   const v = str(fd, key);
   return v.length ? v : null;
-}
-function slugify(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
 function eventPayload(fd: FormData) {
@@ -86,6 +85,18 @@ export async function registerForEvent(eventId: string, slug: string, fd: FormDa
     personId = person?.id ?? null;
   }
 
+  // Capacity → waitlist behavior.
+  const [{ data: event }, { count: activeCount }] = await Promise.all([
+    supabase.from("events").select("capacity, registration_open").eq("id", eventId).single(),
+    supabase
+      .from("event_registrations")
+      .select("*", { count: "exact", head: true })
+      .eq("event_id", eventId)
+      .neq("status", "cancelled"),
+  ]);
+  if (!event?.registration_open) throw new Error("Registration is closed");
+  const status = decideRegistrationStatus(event.capacity, activeCount ?? 0);
+
   const { error } = await supabase.from("event_registrations").insert({
     event_id: eventId,
     person_id: personId,
@@ -94,8 +105,9 @@ export async function registerForEvent(eventId: string, slug: string, fd: FormDa
     email: email?.toLowerCase() ?? null,
     phone: nullable(fd, "phone"),
     responses: { notes: str(fd, "notes") },
+    status,
   });
   if (error) throw new Error(error.message);
   revalidatePath(`/admin/events/${eventId}`);
-  redirect(`/events/${slug}?registered=1`);
+  redirect(`/events/${slug}?registered=${status === "waitlisted" ? "waitlist" : "1"}`);
 }

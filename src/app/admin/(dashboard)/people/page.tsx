@@ -7,10 +7,10 @@ export const metadata = { title: "People — H2O Hub" };
 export default async function PeoplePage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; status?: string; tag?: string }>;
 }) {
-  const { q = "" } = await searchParams;
-  const people = await listPeople(q);
+  const { q = "", status = "", tag = "" } = await searchParams;
+  const people = await listPeople(q, { status: status || undefined, tag: tag || undefined });
 
   return (
     <div>
@@ -35,8 +35,8 @@ export default async function PeoplePage({
         </div>
       </div>
 
-      <form className="mt-6" action="/admin/people">
-        <div className="flex items-center gap-2 rounded-full border border-ink/15 bg-cream px-5 py-1.5 focus-within:border-brand">
+      <form className="mt-6 flex flex-wrap items-center gap-3" action="/admin/people">
+        <div className="flex min-w-64 flex-1 items-center gap-2 rounded-full border border-ink/15 bg-cream px-5 py-1.5 focus-within:border-brand">
           <svg viewBox="0 0 24 24" className="h-5 w-5 text-ink/40" fill="none" stroke="currentColor" strokeWidth="1.8">
             <circle cx="11" cy="11" r="7" />
             <path d="M21 21l-4-4" strokeLinecap="round" />
@@ -47,12 +47,37 @@ export default async function PeoplePage({
             placeholder="Search name, email, or phone…"
             className="w-full bg-transparent py-2 text-ink outline-none placeholder:text-ink/40"
           />
-          {q ? (
-            <Link href="/admin/people" className="text-sm font-semibold text-ink/50 hover:text-ink">
-              Clear
-            </Link>
-          ) : null}
         </div>
+        <select
+          name="status"
+          defaultValue={status}
+          className="rounded-full border border-ink/15 bg-cream px-4 py-2.5 text-sm text-ink outline-none focus:border-brand"
+        >
+          <option value="">All statuses</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="prospect">Prospect</option>
+        </select>
+        <input
+          name="tag"
+          defaultValue={tag}
+          placeholder="Tag"
+          className="w-28 rounded-full border border-ink/15 bg-cream px-4 py-2.5 text-sm text-ink outline-none focus:border-brand"
+        />
+        <button className="rounded-full bg-ink px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-cream transition-colors hover:bg-brand">
+          Filter
+        </button>
+        {q || status || tag ? (
+          <Link href="/admin/people" className="text-sm font-semibold text-ink/50 hover:text-ink">
+            Clear
+          </Link>
+        ) : null}
+        <Link
+          href="/admin/people/households"
+          className="ml-auto text-sm font-semibold text-brand hover:text-deep"
+        >
+          Manage households →
+        </Link>
       </form>
 
       <div className="mt-6 overflow-hidden rounded-3xl border border-ink/10 bg-cream">

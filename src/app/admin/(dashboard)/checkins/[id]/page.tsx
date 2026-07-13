@@ -40,7 +40,15 @@ export default async function SessionPage({ params }: { params: Promise<{ id: st
         <Link href="/admin/checkins" className="text-sm font-semibold text-ink/50 hover:text-brand">
           ← Back to check-ins
         </Link>
-        <DeleteButton action={remove} label="Delete session" confirm={`Delete session ${s.name}?`} />
+        <div className="flex items-center gap-3">
+          <a
+            href={`/admin/checkins/${id}/export`}
+            className="rounded-full border border-ink/15 px-5 py-2.5 text-sm font-bold uppercase tracking-widest text-ink transition-colors hover:border-brand hover:text-brand"
+          >
+            Export CSV
+          </a>
+          <DeleteButton action={remove} label="Delete session" confirm={`Delete session ${s.name}?`} />
+        </div>
       </div>
 
       <div className="mt-6">

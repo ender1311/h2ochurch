@@ -65,6 +65,49 @@ export async function deletePerson(id: string) {
   redirect("/admin/people");
 }
 
+export async function createHousehold(fd: FormData) {
+  await requireStaff();
+  const name = str(fd, "name");
+  if (!name) return;
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("households").insert({ name });
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/people/households");
+}
+
+export async function deleteHousehold(id: string) {
+  await requireStaff();
+  const supabase = createAdminClient();
+  await supabase.from("households").delete().eq("id", id);
+  revalidatePath("/admin/people/households");
+}
+
+export async function createFieldDefinition(fd: FormData) {
+  await requireStaff();
+  const label = str(fd, "label");
+  if (!label) return;
+  const key = label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+  const kind = str(fd, "kind") || "text";
+  const supabase = createAdminClient();
+  const { error } = await supabase
+    .from("field_definitions")
+    .upsert({ key, label, kind }, { onConflict: "key" });
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin/settings/fields");
+}
+
+export async function deleteFieldDefinition(id: string) {
+  await requireStaff();
+  const supabase = createAdminClient();
+  await supabase.from("field_definitions").delete().eq("id", id);
+  revalidatePath("/admin/settings/fields");
+}
+
+/** Form-friendly wrapper: save one custom field value from a person page form. */
+export async function saveCustomField(personId: string, fieldId: string, fd: FormData) {
+  await setPersonCustomField(personId, fieldId, str(fd, "value"));
+}
+
 export async function setPersonCustomField(personId: string, fieldId: string, value: string) {
   await requireStaff();
   const supabase = createAdminClient();

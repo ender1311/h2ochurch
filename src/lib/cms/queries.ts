@@ -16,7 +16,10 @@ export async function getStats() {
   };
 }
 
-export async function listPeople(search?: string): Promise<Person[]> {
+export async function listPeople(
+  search?: string,
+  filters: { status?: string; tag?: string } = {},
+): Promise<Person[]> {
   const supabase = createAdminClient();
   let query = supabase
     .from("people")
@@ -32,10 +35,43 @@ export async function listPeople(search?: string): Promise<Person[]> {
       `first_name.ilike.${like},last_name.ilike.${like},email.ilike.${like},phone.ilike.${like}`,
     );
   }
+  if (filters.status) query = query.eq("status", filters.status);
+  if (filters.tag) query = query.contains("tags", [filters.tag]);
 
   const { data, error } = await query;
   if (error) throw error;
   return (data ?? []) as Person[];
+}
+
+export async function listHouseholdsWithCounts() {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("households")
+    .select("*, people(count)")
+    .order("name");
+  if (error) throw error;
+  return (data ?? []).map((h) => {
+    const counts = (h as unknown as { people: { count: number }[] }).people;
+    const { people, ...rest } = h as { id: string; name: string; created_at: string; people: unknown };
+    void people;
+    return { ...rest, member_count: counts?.[0]?.count ?? 0 };
+  });
+}
+
+export async function listFieldDefinitions() {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.from("field_definitions").select("*").order("label");
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function getPersonFieldValues(personId: string): Promise<Map<string, string>> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("person_field_values")
+    .select("field_id, value")
+    .eq("person_id", personId);
+  return new Map((data ?? []).map((v) => [v.field_id as string, (v.value as string) ?? ""]));
 }
 
 export type PersonWithGroups = Person & {

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { registerForEvent } from "@/lib/cms/actions/events";
+import { spotsLeft } from "@/lib/cms/registration";
 import { PageHero } from "@/components/site/PageHero";
 import type { EventRow } from "@/lib/cms/types";
 
@@ -30,6 +31,14 @@ export default async function PublicEventPage({
   const { data } = await supabase.from("events").select("*").eq("slug", slug).maybeSingle();
   if (!data || data.visibility !== "listed") notFound();
   const ev = data as EventRow;
+
+  const { count: activeCount } = await supabase
+    .from("event_registrations")
+    .select("*", { count: "exact", head: true })
+    .eq("event_id", ev.id)
+    .neq("status", "cancelled");
+  const remaining = spotsLeft(ev.capacity, activeCount ?? 0);
+  const isFull = remaining === 0;
 
   const register = registerForEvent.bind(null, ev.id, slug);
   const when = fmt(ev.starts_at);
@@ -70,7 +79,20 @@ export default async function PublicEventPage({
           </div>
 
           <div className="rounded-3xl border border-ink/10 bg-cream p-8">
-            {registered ? (
+            {registered === "waitlist" ? (
+              <div className="text-center">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-slate text-white">
+                  <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v5l3 3" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <h2 className="mt-5 font-display text-2xl font-bold text-ink">You&apos;re on the waitlist</h2>
+                <p className="mt-2 text-ink/60">
+                  This event is currently full — we&apos;ll reach out if a spot opens up.
+                </p>
+              </div>
+            ) : registered ? (
               <div className="text-center">
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand text-cream">
                   <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2">
@@ -82,7 +104,17 @@ export default async function PublicEventPage({
               </div>
             ) : ev.registration_open ? (
               <form action={register} className="grid gap-4">
-                <h2 className="font-display text-2xl font-bold text-ink">Register</h2>
+                <h2 className="font-display text-2xl font-bold text-ink">
+                  {isFull ? "Join the waitlist" : "Register"}
+                </h2>
+                {remaining !== null && !isFull ? (
+                  <p className="-mt-2 text-sm font-semibold text-brand">{remaining} spots left</p>
+                ) : null}
+                {isFull ? (
+                  <p className="-mt-2 text-sm text-ink/60">
+                    This event is full — sign up below and we&apos;ll contact you if a spot opens.
+                  </p>
+                ) : null}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <input name="first_name" required placeholder="First name" className="rounded-xl border border-ink/15 bg-paper px-4 py-3 outline-none focus:border-brand" />
                   <input name="last_name" required placeholder="Last name" className="rounded-xl border border-ink/15 bg-paper px-4 py-3 outline-none focus:border-brand" />
@@ -91,7 +123,7 @@ export default async function PublicEventPage({
                 <input name="phone" placeholder="Phone" className="rounded-xl border border-ink/15 bg-paper px-4 py-3 outline-none focus:border-brand" />
                 <textarea name="notes" rows={2} placeholder="Anything we should know?" className="rounded-xl border border-ink/15 bg-paper px-4 py-3 outline-none focus:border-brand" />
                 <button className="rounded-full bg-brand py-3.5 text-sm font-bold uppercase tracking-widest text-cream transition-colors hover:bg-water">
-                  Register
+                  {isFull ? "Join Waitlist" : "Register"}
                 </button>
               </form>
             ) : (

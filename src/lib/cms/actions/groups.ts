@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/auth";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { slugify } from "@/lib/cms/slug";
 
 function str(fd: FormData, key: string): string {
   return (fd.get(key) as string | null)?.trim() ?? "";
@@ -11,12 +12,6 @@ function str(fd: FormData, key: string): string {
 function nullable(fd: FormData, key: string): string | null {
   const v = str(fd, key);
   return v.length ? v : null;
-}
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
 }
 
 function groupPayload(fd: FormData) {

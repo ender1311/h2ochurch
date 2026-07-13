@@ -34,6 +34,20 @@ export default async function SettingsPage() {
           <h2 className="font-display text-xl font-bold text-ink">Import / Export</h2>
           <p className="mt-1 text-sm text-ink/60">Move data in and out via CSV.</p>
         </Link>
+        <Link
+          href="/admin/settings/fields"
+          className="rounded-3xl border border-ink/10 bg-cream p-7 transition-colors hover:border-brand"
+        >
+          <h2 className="font-display text-xl font-bold text-ink">Custom fields</h2>
+          <p className="mt-1 text-sm text-ink/60">Define extra fields tracked on every person.</p>
+        </Link>
+        <Link
+          href="/admin/people/households"
+          className="rounded-3xl border border-ink/10 bg-cream p-7 transition-colors hover:border-brand"
+        >
+          <h2 className="font-display text-xl font-bold text-ink">Households</h2>
+          <p className="mt-1 text-sm text-ink/60">Group family members together.</p>
+        </Link>
       </div>
     </div>
   );

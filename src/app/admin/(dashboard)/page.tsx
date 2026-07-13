@@ -1,10 +1,18 @@
 import Link from "next/link";
 import { getStats } from "@/lib/cms/queries";
+import { createAdminClient } from "@/utils/supabase/admin";
+import { upcomingBirthdays } from "@/lib/cms/birthdays";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminDashboard() {
   const stats = await getStats();
+  const supabase = createAdminClient();
+  const { data: birthdayRows } = await supabase
+    .from("people")
+    .select("id, first_name, last_name, birthdate")
+    .not("birthdate", "is", null);
+  const birthdays = upcomingBirthdays(birthdayRows ?? [], 30);
 
   const cards = [
     { label: "People", value: stats.people, href: "/admin/people", hint: "in your directory" },
@@ -31,6 +39,30 @@ export default async function AdminDashboard() {
           </Link>
         ))}
       </div>
+
+      {birthdays.length ? (
+        <div className="mt-10 rounded-3xl border border-ink/10 bg-cream p-7">
+          <h2 className="text-xs font-bold uppercase tracking-widest text-ink/50">
+            Birthdays — next 30 days
+          </h2>
+          <div className="mt-4 flex flex-wrap gap-3">
+            {birthdays.map((b) => (
+              <Link
+                key={b.id}
+                href={`/admin/people/${b.id}`}
+                className="flex items-center gap-2 rounded-full border border-ink/10 px-4 py-2 text-sm transition-colors hover:border-brand"
+              >
+                <span className="font-semibold text-ink">
+                  {b.first_name} {b.last_name}
+                </span>
+                <span className="text-ink/50">
+                  {b.nextBirthday.toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
 
       <div className="mt-10 grid gap-5 sm:grid-cols-2">
         <Link

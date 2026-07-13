@@ -49,7 +49,7 @@ const FEATURES = [
     id: "community",
     title: "Our Community",
     body: "As a church body, we live life together. Our Bible studies and community groups meet throughout the week on different parts of campus. Click below for more info!",
-    href: "/#community",
+    href: "/groups",
     icon: (
       <>
         <circle cx="8" cy="9" r="3" stroke="currentColor" strokeWidth="1.6" />

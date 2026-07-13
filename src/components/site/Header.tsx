@@ -16,7 +16,7 @@ const NAV: { label: string; children: { label: string; href: string }[] }[] = [
   {
     label: "Connect",
     children: [
-      { label: "Groups", href: "/#community" },
+      { label: "Groups", href: "/groups" },
       { label: "Sunday Gatherings", href: "/#sundays" },
       { label: "Baptism", href: "/#connect" },
       { label: "H2O Apparel", href: "/#connect" },

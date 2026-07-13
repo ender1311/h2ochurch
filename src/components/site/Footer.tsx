@@ -55,7 +55,7 @@ export function Footer() {
               Connect
             </h3>
             {[
-              { label: "Groups", href: "/#community" },
+              { label: "Groups", href: "/groups" },
               { label: "Sunday Gatherings", href: "/#sundays" },
               { label: "Baptism", href: "/#connect" },
               { label: "Events", href: "/events" },

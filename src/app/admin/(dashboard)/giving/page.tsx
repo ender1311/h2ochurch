@@ -37,6 +37,12 @@ export default async function GivingPage() {
   const rows = (donations ?? []) as DonationRow[];
   const total = rows.reduce((sum, d) => sum + d.amount_cents, 0);
 
+  const byFund = new Map<string, number>();
+  for (const d of rows) {
+    const key = d.funds?.name ?? "General";
+    byFund.set(key, (byFund.get(key) ?? 0) + d.amount_cents);
+  }
+
   return (
     <div>
       <h1 className="font-display text-4xl font-extrabold text-ink">Giving</h1>
@@ -56,6 +62,19 @@ export default async function GivingPage() {
           <p className="mt-2 font-display text-4xl font-extrabold text-ink">{fundList.length}</p>
         </div>
       </div>
+
+      {byFund.size ? (
+        <div className="mt-4 flex flex-wrap gap-3">
+          {[...byFund.entries()]
+            .sort((a, b) => b[1] - a[1])
+            .map(([name, cents]) => (
+              <span key={name} className="rounded-full border border-ink/10 bg-cream px-4 py-2 text-sm">
+                <span className="font-semibold text-ink">{name}</span>{" "}
+                <span className="font-bold text-brand">{money(cents)}</span>
+              </span>
+            ))}
+        </div>
+      ) : null}
 
       <div className="mt-8 grid gap-5 lg:grid-cols-2">
         {/* Record a gift */}
