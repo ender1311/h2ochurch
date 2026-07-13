@@ -51,7 +51,8 @@ export default async function UsersPage() {
         </button>
       </form>
       <p className="mt-2 text-xs text-ink/40">
-        Invited users get an email to set their password. Only admins &amp; staff can sign in to the Hub.
+        Invited users get an email with a link to set their password (expires in 24 hours). Only
+        admins &amp; staff can sign in to the Hub.
       </p>
 
       {/* Users */}
