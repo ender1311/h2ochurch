@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { requireStaffApi } from "@/lib/auth";
 import { toCsv } from "@/lib/cms/csv";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const denied = await requireStaffApi();
+  if (denied) return denied;
+
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("donations")

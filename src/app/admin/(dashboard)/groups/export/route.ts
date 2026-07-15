@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { listGroupsWithCounts } from "@/lib/cms/queries";
+import { requireStaffApi } from "@/lib/auth";
 import { toCsv } from "@/lib/cms/csv";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const denied = await requireStaffApi();
+  if (denied) return denied;
+
   const groups = await listGroupsWithCounts();
   const csv = toCsv(groups, [
     { key: "name", label: "Name" },

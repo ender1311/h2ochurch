@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/Reveal";
 import { Carousel } from "@/components/site/Carousel";
+import { COMMUNITY_PHOTOS } from "@/lib/photos";
 
 export default function Home() {
   return (
@@ -20,7 +21,7 @@ export default function Home() {
 function Hero() {
   return (
     <section className="relative flex min-h-[70vh] items-center overflow-hidden bg-slate">
-      <Image src="/images/hero-banner.png" alt="" fill priority sizes="100vw" className="object-cover" />
+      <Image src="/images/hero-gathering.webp" alt="" fill priority sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-gradient-to-r from-charcoal/85 via-charcoal/60 to-charcoal/30" />
 
       <div className="relative z-10 mx-auto w-full max-w-7xl px-5 py-24 sm:px-8">
@@ -114,7 +115,7 @@ function FeatureCards() {
 function SermonBand() {
   return (
     <section id="sundays" className="relative scroll-mt-24 overflow-hidden py-20 sm:py-28">
-      <Image src="/images/worship.jpg" alt="" fill sizes="100vw" className="object-cover" />
+      <Image src="/images/worship-night.webp" alt="" fill sizes="100vw" className="object-cover" />
       <div className="absolute inset-0 bg-brand/90" />
       <div className="relative mx-auto grid max-w-6xl gap-12 px-5 sm:px-8 lg:grid-cols-2">
         <Reveal>
@@ -126,8 +127,8 @@ function SermonBand() {
             Missed a Sunday, or want to revisit a message? Every sermon is available to watch and listen
             wherever you are.
           </p>
-          <a
-            href="#"
+          <Link
+            href="/sermons"
             className="mt-8 inline-flex items-center gap-3 border border-white/60 px-7 py-3.5 text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-brand"
           >
             <span className="flex h-6 w-6 items-center justify-center rounded-full border border-current">
@@ -135,8 +136,8 @@ function SermonBand() {
                 <path d="M2 1l8 5-8 5z" />
               </svg>
             </span>
-            Watch &amp; Listen to Past Sermons
-          </a>
+            Listen to Past Sermons
+          </Link>
         </Reveal>
 
         <Reveal delay={150}>
@@ -161,15 +162,6 @@ function SermonBand() {
 }
 
 /* ── What's different ───────────────────────────────────────────────── */
-const COMMUNITY_PHOTOS = [
-  "/images/community-4.png",
-  "/images/community-5.png",
-  "/images/community-6.png",
-  "/images/community-7.png",
-  "/images/community-8.png",
-  "/images/community-9.png",
-];
-
 function Different() {
   return (
     <section id="different" className="scroll-mt-24 bg-white py-20 sm:py-28">
@@ -223,7 +215,9 @@ function SocialBand() {
           <span className="h-px w-10 bg-brand" />
         </div>
         <a
-          href="https://instagram.com"
+          href="https://instagram.com/h2ocolumbus"
+          target="_blank"
+          rel="noopener noreferrer"
           className="mt-8 inline-block bg-brand px-9 py-4 text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-deep"
         >
           Follow Us on Instagram
@@ -250,7 +244,7 @@ function ConnectCTA() {
           </p>
         </div>
         <Link
-          href="#connect"
+          href="/groups"
           className="shrink-0 border border-white px-8 py-4 text-sm font-bold uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-brand"
         >
           Join a Group

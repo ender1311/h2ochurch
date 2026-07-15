@@ -3,11 +3,12 @@ import { updateSession } from "@/utils/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isLogin = pathname === "/admin/login";
+  const isAuthPage =
+    pathname === "/admin/login" || pathname === "/admin/signup" || pathname === "/admin/reset";
   const { supabase, response, user } = await updateSession(request);
 
   if (!user) {
-    if (isLogin) return response;
+    if (isAuthPage) return response;
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     url.searchParams.set("next", pathname);
@@ -22,14 +23,14 @@ export async function middleware(request: NextRequest) {
 
   const allowed = profile?.role === "admin" || profile?.role === "staff";
 
-  if (!allowed && !isLogin) {
+  if (!allowed && !isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     url.searchParams.set("e", "forbidden");
     return NextResponse.redirect(url);
   }
 
-  if (allowed && isLogin) {
+  if (allowed && isAuthPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     url.search = "";

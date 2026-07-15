@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { requireStaffApi } from "@/lib/auth";
 import { toCsv } from "@/lib/cms/csv";
 import type { EventRegistration } from "@/lib/cms/types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  const denied = await requireStaffApi();
+  if (denied) return denied;
+
   const { id } = await params;
   const supabase = createAdminClient();
   const { data } = await supabase

@@ -127,3 +127,17 @@ export type CalendarEvent = {
   created_at: string;
   updated_at: string;
 };
+
+export type Sermon = {
+  id: string;
+  title: string;
+  speaker: string | null;
+  series: string | null;
+  scripture: string | null;
+  description: string | null;
+  audio_url: string | null;
+  preached_on: string | null;
+  published: boolean;
+  created_at: string;
+  updated_at: string;
+};

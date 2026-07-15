@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { requireStaffApi } from "@/lib/auth";
 import { importPeopleGroups } from "@/lib/cms/csv";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
+  const denied = await requireStaffApi();
+  if (denied) return denied;
+
   let body: { csv?: string; dryRun?: boolean };
   try {
     body = await request.json();

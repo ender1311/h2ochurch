@@ -25,7 +25,7 @@ if (!token || !resendKey) {
 
 const body = {
   smtp_host: "smtp.resend.com",
-  smtp_port: 465,
+  smtp_port: "465",
   smtp_user: "resend",
   smtp_pass: resendKey,
   smtp_admin_email: from,
@@ -33,6 +33,14 @@ const body = {
   smtp_max_frequency: 1,
   site_url: site,
   uri_allow_list: `${site}/**,http://localhost:3000/**`,
+  // Self-serve signup (@h2osu.org gate is enforced in the app + auth trigger).
+  external_email_enabled: true,
+  disable_signup: false,
+  // Require users to confirm their email before the account is usable.
+  // NOTE: confirmation + password-reset emails only deliver to arbitrary
+  // recipients once a sending domain (e.g. h2osu.org / h2ocolumbus.org) is
+  // verified in Resend. Until then they reach only the Resend account owner.
+  mailer_autoconfirm: false,
 };
 
 const res = await fetch(`https://api.supabase.com/v1/projects/${PROJECT_REF}/config/auth`, {

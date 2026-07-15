@@ -23,6 +23,7 @@ const TABLES = [
   "service_plans",
   "plan_items",
   "plan_assignments",
+  "sermons",
 ];
 
 describe.skipIf(!hasDbEnv())("RLS lockdown (anon key)", () => {
@@ -44,6 +45,20 @@ describe.skipIf(!hasDbEnv())("RLS lockdown (anon key)", () => {
     const { error } = await supabase
       .from("people")
       .insert({ first_name: "Nope", last_name: "Nope" });
+    expect(error).toBeTruthy();
+  });
+
+  test("anon cannot insert into sermons", async () => {
+    const supabase = anonClient();
+    const { error } = await supabase.from("sermons").insert({ title: "Nope" });
+    expect(error).toBeTruthy();
+  });
+
+  test("anon cannot upload to the sermons storage bucket", async () => {
+    const supabase = anonClient();
+    const { error } = await supabase.storage
+      .from("sermons")
+      .upload(`anon-${Date.now()}.txt`, new Blob(["nope"]));
     expect(error).toBeTruthy();
   });
 });

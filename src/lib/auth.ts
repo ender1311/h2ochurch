@@ -50,3 +50,16 @@ export async function requireAdmin(): Promise<SessionProfile> {
   }
   return profile;
 }
+
+/**
+ * Route-handler guard: returns a 403 Response when the caller is not staff,
+ * or null when authorized. Use in API/export route handlers as defense in
+ * depth so sensitive endpoints authorize independently of middleware.
+ */
+export async function requireStaffApi(): Promise<Response | null> {
+  const profile = await getProfile();
+  if (!profile || (profile.role !== "admin" && profile.role !== "staff")) {
+    return new Response("Forbidden", { status: 403 });
+  }
+  return null;
+}

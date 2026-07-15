@@ -1,21 +1,27 @@
+import Image from "next/image";
+
 type LogoProps = {
   className?: string;
   tone?: "light" | "dark";
 };
 
-export function Logo({ className = "", tone = "dark" }: LogoProps) {
-  const text = tone === "light" ? "text-white" : "text-ink";
-  const sub = tone === "light" ? "text-white/80" : "text-ink/60";
+const BRAND = {
+  light: { src: "/images/brand/h2o-logo-white.png", width: 3078, height: 1797 },
+  dark: { src: "/images/brand/h2o-logo-color.png", width: 2945, height: 1666 },
+} as const;
+
+export function Logo({ className = "h-11 w-auto", tone = "dark" }: LogoProps) {
+  const { src, width, height } = BRAND[tone];
 
   return (
-    <span className={`inline-flex flex-col items-center leading-none ${className}`}>
-      <span className={`font-display text-3xl font-bold tracking-tight ${text}`}>
-        H<span className="align-baseline text-[0.7em]">2</span>O
-      </span>
-      <span className={`mt-1 text-[0.6rem] font-medium uppercase tracking-[0.55em] ${sub}`}>
-        Church
-      </span>
-    </span>
+    <Image
+      src={src}
+      alt="H2O Church"
+      width={width}
+      height={height}
+      className={className}
+      priority
+    />
   );
 }
 

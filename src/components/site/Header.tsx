@@ -18,20 +18,10 @@ const NAV: { label: string; children: { label: string; href: string }[] }[] = [
     children: [
       { label: "Groups", href: "/groups" },
       { label: "Sunday Gatherings", href: "/#sundays" },
-      { label: "Baptism", href: "/#connect" },
-      { label: "H2O Apparel", href: "/#connect" },
+      { label: "Sermons", href: "/sermons" },
     ],
   },
   { label: "Events", children: [{ label: "Upcoming Events", href: "/events" }] },
-  {
-    label: "Serve",
-    children: [
-      { label: "Locally", href: "/#connect" },
-      { label: "Globally", href: "/#connect" },
-      { label: "At H2O", href: "/#connect" },
-      { label: "Internship Program", href: "/#connect" },
-    ],
-  },
   { label: "Give", children: [{ label: "Give Online", href: "/give" }] },
 ];
 
@@ -83,12 +73,6 @@ export function Header() {
               ) : null}
             </div>
           ))}
-          <button aria-label="Search" className="ml-2 text-white/85 transition-colors hover:text-white">
-            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="7" />
-              <path d="M21 21l-4-4" strokeLinecap="round" />
-            </svg>
-          </button>
         </nav>
 
         <button

@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
+import type { SitePhoto } from "@/lib/photos";
 
-export function Carousel({ images }: { images: string[] }) {
+export function Carousel({ images }: { images: SitePhoto[] }) {
   const [i, setI] = useState(0);
   const [paused, setPaused] = useState(false);
   const [lightbox, setLightbox] = useState(false);
@@ -42,18 +43,18 @@ export function Carousel({ images }: { images: string[] }) {
       onMouseLeave={() => setPaused(false)}
     >
       <div className="group relative aspect-square overflow-hidden rounded-lg shadow-2xl">
-        {images.map((src, idx) => (
+        {images.map((photo, idx) => (
           <button
-            key={src}
-            aria-label="Enlarge photo"
+            key={photo.src}
+            aria-label={`Enlarge photo: ${photo.scene}`}
             onClick={() => setLightbox(true)}
             className={`absolute inset-0 cursor-zoom-in transition-opacity duration-700 ${
               idx === i ? "opacity-100" : "pointer-events-none opacity-0"
             }`}
           >
             <Image
-              src={src}
-              alt={`H2O community photo ${idx + 1}`}
+              src={photo.src}
+              alt={photo.alt}
               fill
               sizes="(max-width: 1024px) 100vw, 45vw"
               className="object-cover"
@@ -81,6 +82,11 @@ export function Carousel({ images }: { images: string[] }) {
             <path d="M9 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </button>
+
+        {/* Scene caption */}
+        <span className="absolute bottom-3 left-3 z-10 max-w-[60%] truncate rounded-full bg-charcoal/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
+          {images[i].scene}
+        </span>
 
         {/* Counter + zoom hint */}
         <span className="absolute bottom-3 right-3 z-10 rounded-full bg-charcoal/60 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
@@ -135,8 +141,8 @@ export function Carousel({ images }: { images: string[] }) {
           </button>
           <div className="relative h-[82vh] w-full max-w-4xl" onClick={(e) => e.stopPropagation()}>
             <Image
-              src={images[i]}
-              alt={`H2O community photo ${i + 1}`}
+              src={images[i].src}
+              alt={images[i].alt}
               fill
               sizes="100vw"
               className="object-contain"
