@@ -5,6 +5,19 @@ import { SermonBandBlock, type SermonBandBlockProps } from "@/components/site/bl
 import { CommunityCarouselBlock, type CommunityCarouselBlockProps } from "@/components/site/blocks/CommunityCarouselBlock";
 import { SocialBandBlock, type SocialBandBlockProps } from "@/components/site/blocks/SocialBandBlock";
 import { ConnectCTABlock, type ConnectCTABlockProps } from "@/components/site/blocks/ConnectCTABlock";
+import { HeadingBlock, type HeadingBlockProps } from "@/components/site/blocks/generic/HeadingBlock";
+import { TextBlock, type TextBlockProps } from "@/components/site/blocks/generic/TextBlock";
+import { ImageBlock, type ImageBlockProps } from "@/components/site/blocks/generic/ImageBlock";
+import { ButtonBlock, type ButtonBlockProps } from "@/components/site/blocks/generic/ButtonBlock";
+import { SpacerBlock, type SpacerBlockProps } from "@/components/site/blocks/generic/SpacerBlock";
+import { ColumnsBlock } from "@/components/site/blocks/generic/ColumnsBlock";
+import { imageField } from "@/lib/puck/fields/imageField";
+import type { Slot } from "@measured/puck";
+
+type ColumnsBlockConfigProps = {
+  left: Slot;
+  right: Slot;
+};
 
 type Props = {
   Hero: HeroBlockProps;
@@ -13,9 +26,23 @@ type Props = {
   CommunityCarousel: CommunityCarouselBlockProps;
   SocialBand: SocialBandBlockProps;
   ConnectCTA: ConnectCTABlockProps;
+  Heading: HeadingBlockProps;
+  Text: TextBlockProps;
+  Image: ImageBlockProps;
+  Button: ButtonBlockProps;
+  Spacer: SpacerBlockProps;
+  Columns: ColumnsBlockConfigProps;
 };
 
 export const config: Config<Props> = {
+  categories: {
+    Homepage: {
+      components: ["Hero", "FeatureCards", "SermonBand", "CommunityCarousel", "SocialBand", "ConnectCTA"],
+    },
+    Content: {
+      components: ["Heading", "Text", "Image", "Button", "Spacer", "Columns"],
+    },
+  },
   components: {
     Hero: {
       fields: {
@@ -24,7 +51,7 @@ export const config: Config<Props> = {
         ctaLabel: { type: "text" },
         ctaHref: { type: "text" },
         videoSrc: { type: "text" },
-        posterSrc: { type: "text" },
+        posterSrc: imageField("Poster Image"),
       },
       defaultProps: {
         headline: "Welcome to H2O",
@@ -146,6 +173,118 @@ export const config: Config<Props> = {
         ctaHref: "/groups",
       },
       render: (props) => <ConnectCTABlock {...props} />,
+    },
+    Heading: {
+      fields: {
+        text: { type: "text" },
+        level: {
+          type: "select",
+          options: [
+            { label: "H1", value: "h1" },
+            { label: "H2", value: "h2" },
+            { label: "H3", value: "h3" },
+          ],
+        },
+        align: {
+          type: "radio",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+          ],
+        },
+      },
+      defaultProps: {
+        text: "Section Heading",
+        level: "h2",
+        align: "left",
+      },
+      render: (props) => <HeadingBlock {...props} />,
+    },
+    Text: {
+      fields: {
+        text: { type: "textarea" },
+        align: {
+          type: "radio",
+          options: [
+            { label: "Left", value: "left" },
+            { label: "Center", value: "center" },
+          ],
+        },
+      },
+      defaultProps: {
+        text: "Add your text here. Separate paragraphs with a blank line.",
+        align: "left",
+      },
+      render: (props) => <TextBlock {...props} />,
+    },
+    Image: {
+      fields: {
+        src: imageField("Image"),
+        alt: { type: "text" },
+        maxWidth: {
+          type: "select",
+          options: [
+            { label: "Small", value: "sm" },
+            { label: "Medium", value: "md" },
+            { label: "Large", value: "lg" },
+            { label: "Full width", value: "full" },
+          ],
+        },
+      },
+      defaultProps: {
+        src: "",
+        alt: "",
+        maxWidth: "full",
+      },
+      render: (props) => <ImageBlock {...props} />,
+    },
+    Button: {
+      fields: {
+        label: { type: "text" },
+        href: { type: "text" },
+        style: {
+          type: "radio",
+          options: [
+            { label: "Solid", value: "solid" },
+            { label: "Outline", value: "outline" },
+          ],
+        },
+      },
+      defaultProps: {
+        label: "Click Here",
+        href: "/",
+        style: "solid",
+      },
+      render: (props) => <ButtonBlock {...props} />,
+    },
+    Spacer: {
+      fields: {
+        size: {
+          type: "select",
+          options: [
+            { label: "Small (24px)", value: "sm" },
+            { label: "Medium (48px)", value: "md" },
+            { label: "Large (96px)", value: "lg" },
+          ],
+        },
+      },
+      defaultProps: {
+        size: "md",
+      },
+      render: (props) => <SpacerBlock {...props} />,
+    },
+    Columns: {
+      fields: {
+        left: { type: "slot" },
+        right: { type: "slot" },
+      },
+      defaultProps: {
+        left: [],
+        right: [],
+      },
+      render: ({ left: Left, right: Right }) => (
+        <ColumnsBlock left={<Left />} right={<Right />} />
+      ),
     },
   },
 };
