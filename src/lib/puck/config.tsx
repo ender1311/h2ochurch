@@ -14,6 +14,8 @@ import { ColumnsBlock } from "@/components/site/blocks/generic/ColumnsBlock";
 import { WhoWeAreHeroBlock, type WhoWeAreHeroBlockProps } from "@/components/site/blocks/about/WhoWeAreHeroBlock";
 import { MissionStatementBlock, type MissionStatementBlockProps } from "@/components/site/blocks/about/MissionStatementBlock";
 import { CoreValuesBlock, type CoreValuesBlockProps } from "@/components/site/blocks/about/CoreValuesBlock";
+import { WhatWeBelieveHeroBlock, type WhatWeBelieveHeroBlockProps } from "@/components/site/blocks/about/WhatWeBelieveHeroBlock";
+import { BeliefsGridBlock, type BeliefsGridBlockProps } from "@/components/site/blocks/about/BeliefsGridBlock";
 import { imageField } from "@/lib/puck/fields/imageField";
 import type { Slot } from "@measured/puck";
 
@@ -38,6 +40,8 @@ type Props = {
   WhoWeAreHero: WhoWeAreHeroBlockProps;
   MissionStatement: MissionStatementBlockProps;
   CoreValues: CoreValuesBlockProps;
+  WhatWeBelieveHero: WhatWeBelieveHeroBlockProps;
+  BeliefsGrid: BeliefsGridBlockProps;
 };
 
 export const config: Config<Props> = {
@@ -46,7 +50,7 @@ export const config: Config<Props> = {
       components: ["Hero", "FeatureCards", "SermonBand", "CommunityCarousel", "SocialBand", "ConnectCTA"],
     },
     About: {
-      components: ["WhoWeAreHero", "MissionStatement", "CoreValues"],
+      components: ["WhoWeAreHero", "MissionStatement", "CoreValues", "WhatWeBelieveHero", "BeliefsGrid"],
     },
     Content: {
       components: ["Heading", "Text", "Image", "Button", "Spacer", "Columns"],
@@ -373,6 +377,85 @@ export const config: Config<Props> = {
         ],
       },
       render: (props) => <CoreValuesBlock {...props} />,
+    },
+    WhatWeBelieveHero: {
+      fields: {
+        eyebrow: { type: "text" },
+        title: { type: "text" },
+        subtitle: { type: "text" },
+      },
+      defaultProps: {
+        eyebrow: "About H2O",
+        title: "What We Believe",
+        subtitle: "We're an orthodox Christian church. These are the core convictions that anchor everything we do.",
+      },
+      render: (props) => <WhatWeBelieveHeroBlock {...props} />,
+    },
+    BeliefsGrid: {
+      fields: {
+        beliefs: {
+          type: "array",
+          arrayFields: {
+            n: { type: "text" },
+            title: { type: "text" },
+            ref: { type: "text" },
+            body: { type: "textarea" },
+          },
+        },
+      },
+      defaultProps: {
+        beliefs: [
+          {
+            n: "01",
+            title: "The Scriptures",
+            ref: "2 Timothy 3:16–17",
+            body: "We believe the Bible is God's inspired, trustworthy Word — the final authority for what we believe and how we live.",
+          },
+          {
+            n: "02",
+            title: "One God, Three Persons",
+            ref: "Matthew 28:19",
+            body: "We believe in one God, eternally existing in three persons: Father, Son, and Holy Spirit — perfect in love, holiness, and power.",
+          },
+          {
+            n: "03",
+            title: "Jesus Christ",
+            ref: "John 1:14; 1 Corinthians 15",
+            body: "We believe Jesus is fully God and fully man, who lived a sinless life, died in our place, rose bodily from the grave, and reigns today.",
+          },
+          {
+            n: "04",
+            title: "The Holy Spirit",
+            ref: "Acts 1:8",
+            body: "We believe the Spirit indwells every follower of Jesus, forming us into Christ's likeness and empowering us for life and mission.",
+          },
+          {
+            n: "05",
+            title: "Salvation by Grace",
+            ref: "Ephesians 2:8–9",
+            body: "We believe salvation is a gift of grace received through faith in Jesus alone — not earned by works, but the free response to mercy already given.",
+          },
+          {
+            n: "06",
+            title: "The Church",
+            ref: "Acts 2:42–47",
+            body: "We believe the Church is God's family — a community that gathers to worship, grows together in discipleship, and is sent to love the world.",
+          },
+          {
+            n: "07",
+            title: "The Mission",
+            ref: "Matthew 28:18–20",
+            body: "We believe every follower of Jesus is called to make disciples — starting on our campus and reaching to all nations.",
+          },
+          {
+            n: "08",
+            title: "The Hope to Come",
+            ref: "Revelation 21",
+            body: "We believe Jesus will return to make all things new, and that we live today in the sure hope of His coming kingdom.",
+          },
+        ],
+      },
+      render: (props) => <BeliefsGridBlock {...props} />,
     },
   },
 };

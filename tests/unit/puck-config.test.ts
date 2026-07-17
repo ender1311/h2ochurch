@@ -22,6 +22,8 @@ const ABOUT_KEYS = [
   "WhoWeAreHero",
   "MissionStatement",
   "CoreValues",
+  "WhatWeBelieveHero",
+  "BeliefsGrid",
 ] as const;
 
 const ALL_KEYS = [...HOMEPAGE_KEYS, ...GENERIC_KEYS, ...ABOUT_KEYS] as const;
@@ -168,4 +170,21 @@ test("CoreValues defaultProps has values array with four items", async () => {
   const dp = comp.defaultProps as Record<string, unknown>;
   expect(Array.isArray(dp["values"])).toBe(true);
   expect((dp["values"] as unknown[]).length).toBe(4);
+});
+
+test("BeliefsGrid defaultProps has beliefs array with eight items", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  const comp = config.components["BeliefsGrid"];
+  const dp = comp.defaultProps as Record<string, unknown>;
+  expect(Array.isArray(dp["beliefs"])).toBe(true);
+  expect((dp["beliefs"] as unknown[]).length).toBe(8);
+});
+
+test("WhatWeBelieveHero defaultProps are sensible", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  const comp = config.components["WhatWeBelieveHero"];
+  const dp = comp.defaultProps as Record<string, unknown>;
+  expect(dp["eyebrow"]).toBeTypeOf("string");
+  expect(dp["title"]).toBeTypeOf("string");
+  expect(dp["subtitle"]).toBeTypeOf("string");
 });
