@@ -23,8 +23,15 @@ export function Editor({ slug, data }: { slug: string; data: Data }) {
           ),
         }}
         onPublish={async (next: Data) => {
-          await savePageDraft(slug, next);
-          await publishPage(slug);
+          try {
+            await savePageDraft(slug, next);
+            await publishPage(slug);
+          } catch (e) {
+            window.alert(
+              `Publish failed: ${e instanceof Error ? e.message : "unknown error"}. Your changes were not published.`,
+            );
+            return;
+          }
           router.push("/admin/pages");
         }}
       />

@@ -7,7 +7,7 @@ import { HistoryDrawer } from "./HistoryDrawer";
 
 export function EditorTopBar({ slug }: { slug: string }) {
   const router = useRouter();
-  const { appState } = usePuck();
+  const { appState, history } = usePuck();
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +45,8 @@ export function EditorTopBar({ slug }: { slug: string }) {
       <button
         type="button"
         onClick={() => {
-          if (window.confirm("Leave the editor? Unsaved changes will be lost unless you saved a draft.")) {
+          const dirty = history?.hasPast ?? false;
+          if (!dirty || window.confirm("Leave the editor? Unsaved changes will be lost unless you saved a draft.")) {
             router.push("/admin/pages");
           }
         }}

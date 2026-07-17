@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type ElementType } from "react";
 
 type RevealProps = {
   children: ReactNode;
@@ -34,7 +34,7 @@ export function Reveal({ children, className = "", delay = 0, as = "div", id }: 
     return () => observer.disconnect();
   }, []);
 
-  const Tag = as as React.ElementType;
+  const Tag = as as ElementType;
   return (
     <Tag
       ref={ref}
