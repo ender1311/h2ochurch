@@ -16,6 +16,8 @@ import { MissionStatementBlock, type MissionStatementBlockProps } from "@/compon
 import { CoreValuesBlock, type CoreValuesBlockProps } from "@/components/site/blocks/about/CoreValuesBlock";
 import { WhatWeBelieveHeroBlock, type WhatWeBelieveHeroBlockProps } from "@/components/site/blocks/about/WhatWeBelieveHeroBlock";
 import { BeliefsGridBlock, type BeliefsGridBlockProps } from "@/components/site/blocks/about/BeliefsGridBlock";
+import { OurTeamHeroBlock, type OurTeamHeroBlockProps } from "@/components/site/blocks/about/OurTeamHeroBlock";
+import { TeamGridBlock, type TeamGridBlockProps } from "@/components/site/blocks/about/TeamGridBlock";
 import { imageField } from "@/lib/puck/fields/imageField";
 import type { Slot } from "@measured/puck";
 
@@ -42,6 +44,8 @@ type Props = {
   CoreValues: CoreValuesBlockProps;
   WhatWeBelieveHero: WhatWeBelieveHeroBlockProps;
   BeliefsGrid: BeliefsGridBlockProps;
+  OurTeamHero: OurTeamHeroBlockProps;
+  TeamGrid: TeamGridBlockProps;
 };
 
 export const config: Config<Props> = {
@@ -50,7 +54,7 @@ export const config: Config<Props> = {
       components: ["Hero", "FeatureCards", "SermonBand", "CommunityCarousel", "SocialBand", "ConnectCTA"],
     },
     About: {
-      components: ["WhoWeAreHero", "MissionStatement", "CoreValues", "WhatWeBelieveHero", "BeliefsGrid"],
+      components: ["WhoWeAreHero", "MissionStatement", "CoreValues", "WhatWeBelieveHero", "BeliefsGrid", "OurTeamHero", "TeamGrid"],
     },
     Content: {
       components: ["Heading", "Text", "Image", "Button", "Spacer", "Columns"],
@@ -456,6 +460,50 @@ export const config: Config<Props> = {
         ],
       },
       render: (props) => <BeliefsGridBlock {...props} />,
+    },
+    OurTeamHero: {
+      fields: {
+        eyebrow: { type: "text" },
+        title: { type: "text" },
+        subtitle: { type: "text" },
+      },
+      defaultProps: {
+        eyebrow: "About H2O",
+        title: "Our Team",
+        subtitle: "As a local church, we live life together in community. Meet the people who help make that happen.",
+      },
+      render: (props) => <OurTeamHeroBlock {...props} />,
+    },
+    TeamGrid: {
+      fields: {
+        members: {
+          type: "array",
+          arrayFields: {
+            name: { type: "text" },
+            role: { type: "text" },
+            since: { type: "number" },
+          },
+        },
+        contactHeading: { type: "text" },
+        contactBody: { type: "text" },
+        contactEmail: { type: "text" },
+      },
+      defaultProps: {
+        members: [
+          { name: "Kathy Borsos", role: "Executive Director", since: 2009 },
+          { name: "Mike Malone", role: "Church Life Director", since: 2000 },
+          { name: "Jeremy Borsos", role: "Staff", since: 2009 },
+          { name: "Will Houghton", role: "Worship Lead Intern", since: 2025 },
+          { name: "Aziz Nahhas", role: "Staff Support", since: 1991 },
+          { name: "Diane Gress", role: "Staff Support", since: 2016 },
+          { name: "Maggie Luk", role: "Staff Support", since: 2014 },
+          { name: "Vivake Baranwal", role: "Staff Support", since: 2012 },
+        ],
+        contactHeading: "Reach the pastoral team",
+        contactBody: "We'd love to hear from you — questions, prayer, or just to say hi.",
+        contactEmail: "pastors@h2osu.org",
+      },
+      render: (props) => <TeamGridBlock {...props} />,
     },
   },
 };

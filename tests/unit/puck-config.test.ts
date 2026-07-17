@@ -24,6 +24,8 @@ const ABOUT_KEYS = [
   "CoreValues",
   "WhatWeBelieveHero",
   "BeliefsGrid",
+  "OurTeamHero",
+  "TeamGrid",
 ] as const;
 
 const ALL_KEYS = [...HOMEPAGE_KEYS, ...GENERIC_KEYS, ...ABOUT_KEYS] as const;
@@ -187,4 +189,30 @@ test("WhatWeBelieveHero defaultProps are sensible", async () => {
   expect(dp["eyebrow"]).toBeTypeOf("string");
   expect(dp["title"]).toBeTypeOf("string");
   expect(dp["subtitle"]).toBeTypeOf("string");
+});
+
+test("OurTeamHero defaultProps are sensible", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  const comp = config.components["OurTeamHero"];
+  const dp = comp.defaultProps as Record<string, unknown>;
+  expect(dp["eyebrow"]).toBeTypeOf("string");
+  expect(dp["title"]).toBeTypeOf("string");
+  expect(dp["subtitle"]).toBeTypeOf("string");
+});
+
+test("TeamGrid defaultProps has members array with eight items", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  const comp = config.components["TeamGrid"];
+  const dp = comp.defaultProps as Record<string, unknown>;
+  expect(Array.isArray(dp["members"])).toBe(true);
+  expect((dp["members"] as unknown[]).length).toBe(8);
+});
+
+test("TeamGrid defaultProps has contact fields", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  const comp = config.components["TeamGrid"];
+  const dp = comp.defaultProps as Record<string, unknown>;
+  expect(dp["contactHeading"]).toBeTypeOf("string");
+  expect(dp["contactBody"]).toBeTypeOf("string");
+  expect(dp["contactEmail"]).toBeTypeOf("string");
 });
