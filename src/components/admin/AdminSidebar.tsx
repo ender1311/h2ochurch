@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 const NAV = [
   { label: "Dashboard", href: "/admin", exact: true, icon: "M4 13h6V4H4v9zm0 7h6v-5H4v5zm10 0h6v-9h-6v9zm0-16v5h6V4h-6z" },
+  { label: "Pages", href: "/admin/pages", icon: "M4 5h16v14H4zM4 9h16M9 9v10" },
   { label: "People", href: "/admin/people", icon: "M8 11a3 3 0 100-6 3 3 0 000 6zm8 0a3 3 0 100-6 3 3 0 000 6zM2 20c0-3 2.5-5 6-5s6 2 6 5M14 20c0-2.5 1.8-4.2 4-4.2s4 1.7 4 4.2" },
   { label: "Groups", href: "/admin/groups", icon: "M4 6h16M4 12h16M4 18h10" },
   { label: "Events", href: "/admin/events", icon: "M4 5h16v16H4zM4 9h16M8 3v4M16 3v4" },
