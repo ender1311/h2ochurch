@@ -141,3 +141,15 @@ export type Sermon = {
   created_at: string;
   updated_at: string;
 };
+
+import type { Data as PuckData } from "@measured/puck";
+
+export type PageRow = {
+  id: string;
+  slug: string;
+  title: string;
+  draft_data: PuckData;
+  published_data: PuckData | null;
+  updated_at: string;
+  updated_by: string | null;
+};
