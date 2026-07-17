@@ -30,10 +30,11 @@ export async function savePageDraft(slug: string, data: PuckData): Promise<void>
 export async function publishPage(slug: string): Promise<void> {
   const profile = await requireStaff();
   const supabase = createAdminClient();
-  const { data } = await supabase.from("pages").select("draft_data").eq("slug", slug).single();
+  const { data, error: readErr } = await supabase.from("pages").select("draft_data").eq("slug", slug).single();
+  if (readErr || !data) throw new Error(`Page not found: ${slug}`);
   const { error } = await supabase
     .from("pages")
-    .update({ published_data: data?.draft_data ?? EMPTY, updated_by: profile.userId })
+    .update({ published_data: data.draft_data, updated_by: profile.userId })
     .eq("slug", slug);
   if (error) throw new Error(error.message);
   revalidatePath(slug === "home" ? "/" : `/${slug}`);
