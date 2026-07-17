@@ -18,7 +18,13 @@ const GENERIC_KEYS = [
   "Columns",
 ] as const;
 
-const ALL_KEYS = [...HOMEPAGE_KEYS, ...GENERIC_KEYS] as const;
+const ABOUT_KEYS = [
+  "WhoWeAreHero",
+  "MissionStatement",
+  "CoreValues",
+] as const;
+
+const ALL_KEYS = [...HOMEPAGE_KEYS, ...GENERIC_KEYS, ...ABOUT_KEYS] as const;
 
 test("config module imports", async () => {
   const mod = await import("../../src/lib/puck/config");
@@ -125,4 +131,41 @@ test("Content category contains all generic components", async () => {
   for (const key of GENERIC_KEYS) {
     expect(contentComponents).toContain(key);
   }
+});
+
+test("config has About category", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  expect(config.categories).toHaveProperty("About");
+});
+
+test("About category contains all about components", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  const aboutComponents = config.categories?.["About"]?.components ?? [];
+  for (const key of ABOUT_KEYS) {
+    expect(aboutComponents).toContain(key);
+  }
+});
+
+test("config.components has all about block keys", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  for (const key of ABOUT_KEYS) {
+    expect(config.components).toHaveProperty(key);
+  }
+});
+
+test("every about component has a render function and defaultProps", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  for (const key of ABOUT_KEYS) {
+    const component = config.components[key as keyof typeof config.components];
+    expect(typeof component.render).toBe("function");
+    expect(component.defaultProps).toBeDefined();
+  }
+});
+
+test("CoreValues defaultProps has values array with four items", async () => {
+  const { config } = await import("../../src/lib/puck/config");
+  const comp = config.components["CoreValues"];
+  const dp = comp.defaultProps as Record<string, unknown>;
+  expect(Array.isArray(dp["values"])).toBe(true);
+  expect((dp["values"] as unknown[]).length).toBe(4);
 });

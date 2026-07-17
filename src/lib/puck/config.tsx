@@ -11,6 +11,9 @@ import { ImageBlock, type ImageBlockProps } from "@/components/site/blocks/gener
 import { ButtonBlock, type ButtonBlockProps } from "@/components/site/blocks/generic/ButtonBlock";
 import { SpacerBlock, type SpacerBlockProps } from "@/components/site/blocks/generic/SpacerBlock";
 import { ColumnsBlock } from "@/components/site/blocks/generic/ColumnsBlock";
+import { WhoWeAreHeroBlock, type WhoWeAreHeroBlockProps } from "@/components/site/blocks/about/WhoWeAreHeroBlock";
+import { MissionStatementBlock, type MissionStatementBlockProps } from "@/components/site/blocks/about/MissionStatementBlock";
+import { CoreValuesBlock, type CoreValuesBlockProps } from "@/components/site/blocks/about/CoreValuesBlock";
 import { imageField } from "@/lib/puck/fields/imageField";
 import type { Slot } from "@measured/puck";
 
@@ -32,12 +35,18 @@ type Props = {
   Button: ButtonBlockProps;
   Spacer: SpacerBlockProps;
   Columns: ColumnsBlockConfigProps;
+  WhoWeAreHero: WhoWeAreHeroBlockProps;
+  MissionStatement: MissionStatementBlockProps;
+  CoreValues: CoreValuesBlockProps;
 };
 
 export const config: Config<Props> = {
   categories: {
     Homepage: {
       components: ["Hero", "FeatureCards", "SermonBand", "CommunityCarousel", "SocialBand", "ConnectCTA"],
+    },
+    About: {
+      components: ["WhoWeAreHero", "MissionStatement", "CoreValues"],
     },
     Content: {
       components: ["Heading", "Text", "Image", "Button", "Spacer", "Columns"],
@@ -285,6 +294,85 @@ export const config: Config<Props> = {
       render: ({ left: Left, right: Right }) => (
         <ColumnsBlock left={<Left />} right={<Right />} />
       ),
+    },
+    WhoWeAreHero: {
+      fields: {
+        eyebrow: { type: "text" },
+        title: { type: "text" },
+        subtitle: { type: "text" },
+      },
+      defaultProps: {
+        eyebrow: "About H2O",
+        title: "Who We Are",
+        subtitle: "A local church living life together on campus at Ohio State — following Jesus and inviting others to do the same.",
+      },
+      render: (props) => <WhoWeAreHeroBlock {...props} />,
+    },
+    MissionStatement: {
+      fields: {
+        eyebrow: { type: "text" },
+        missionText: { type: "text" },
+        emphasizedWord: { type: "text" },
+        missionTextAfter: { type: "text" },
+      },
+      defaultProps: {
+        eyebrow: "Our Mission",
+        missionText: "Cultivating a Christlike community at OSU to grow His",
+        emphasizedWord: "kingdom",
+        missionTextAfter: "wherever we go.",
+      },
+      render: (props) => <MissionStatementBlock {...props} />,
+    },
+    CoreValues: {
+      fields: {
+        eyebrow: { type: "text" },
+        heading: { type: "text" },
+        tovWord: { type: "text" },
+        tovHebrew: { type: "text" },
+        bodyBefore: { type: "textarea" },
+        bodyTovWord: { type: "text" },
+        bodyAfter: { type: "textarea" },
+        values: {
+          type: "array",
+          arrayFields: {
+            emphasis: { type: "text" },
+            rest: { type: "text" },
+            body: { type: "textarea" },
+          },
+        },
+      },
+      defaultProps: {
+        eyebrow: "Our Core Values",
+        heading: "A church of",
+        tovWord: "Tov",
+        tovHebrew: "(טוב)",
+        bodyBefore: "We hold four primary values, each aimed to help us cultivate a Christlike community at OSU by being a church of ",
+        bodyTovWord: "Tov",
+        bodyAfter: ". Tov is the Hebrew word the Bible uses to describe “Goodness” — something that fully embodies the divine purpose for which God has designed it.",
+        values: [
+          {
+            emphasis: "Spiritual Formation",
+            rest: "is our way",
+            body: "We — having put our faith in Christ as the true Way — cultivate one another in apprenticeship to Jesus by walking with him in fervent prayer, study and meditation on scripture, spiritual disciplines, and obedience to his teachings.",
+          },
+          {
+            emphasis: "Community",
+            rest: "is our reality",
+            body: "We share life together in fellowship, walking with one another in authenticity, kindness, grace, and holiness.",
+          },
+          {
+            emphasis: "Humility",
+            rest: "is our posture",
+            body: "We aim to embody Christlikeness by living and serving with transparency, understanding, and the admission that we are all in need of grace from God and from one another.",
+          },
+          {
+            emphasis: "Mission",
+            rest: "is our call",
+            body: "We partake in the growth of God’s Kingdom by preaching the Gospel, by showing hospitality to our neighbors, by living justly, and by serving the felt needs of our campus, city, and world.",
+          },
+        ],
+      },
+      render: (props) => <CoreValuesBlock {...props} />,
     },
   },
 };
