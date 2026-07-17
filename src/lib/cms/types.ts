@@ -1,3 +1,5 @@
+import type { Data as PuckData } from "@measured/puck";
+
 export type PersonStatus = "active" | "inactive" | "prospect";
 export type GroupVisibility = "listed" | "unlisted";
 export type MembershipRole = "leader" | "member";
@@ -141,8 +143,6 @@ export type Sermon = {
   created_at: string;
   updated_at: string;
 };
-
-import type { Data as PuckData } from "@measured/puck";
 
 export type PageRow = {
   id: string;
