@@ -19,11 +19,13 @@ export async function getPageDraft(slug: string): Promise<PuckData> {
 export async function savePageDraft(slug: string, data: PuckData): Promise<void> {
   const profile = await requireStaff();
   const supabase = createAdminClient();
-  const { error } = await supabase
+  const { data: rows, error } = await supabase
     .from("pages")
     .update({ draft_data: data, updated_by: profile.userId })
-    .eq("slug", slug);
+    .eq("slug", slug)
+    .select("id");
   if (error) throw new Error(error.message);
+  if (!rows || rows.length === 0) throw new Error(`Page not found: ${slug}`);
   revalidatePath(`/admin/pages/${slug}/edit`);
 }
 
