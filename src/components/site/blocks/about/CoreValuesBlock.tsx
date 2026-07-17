@@ -1,5 +1,3 @@
-"use client";
-
 import { Reveal } from "@/components/Reveal";
 import { Accordion, type AccordionItem } from "@/components/site/Accordion";
 

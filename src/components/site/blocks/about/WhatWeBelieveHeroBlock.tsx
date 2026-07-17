@@ -1,5 +1,3 @@
-"use client";
-
 import { PageHero } from "@/components/site/PageHero";
 import { AboutNav } from "@/components/site/AboutNav";
 
