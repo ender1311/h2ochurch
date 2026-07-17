@@ -8,6 +8,15 @@ import { slugify } from "@/lib/cms/slug";
 const EMPTY: PuckData = { root: { props: {} }, content: [] };
 const ASSET_BUCKET = "site-assets";
 const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
+const MAX_VERSIONS_PER_SLUG = 50;
+
+export type PageVersion = {
+  id: string;
+  slug: string;
+  title: string;
+  createdAt: string;
+  authorName: string | null;
+};
 
 export async function getPageDraft(slug: string): Promise<PuckData> {
   await requireStaff();
@@ -32,13 +41,32 @@ export async function savePageDraft(slug: string, data: PuckData): Promise<void>
 export async function publishPage(slug: string): Promise<void> {
   const profile = await requireStaff();
   const supabase = createAdminClient();
-  const { data, error: readErr } = await supabase.from("pages").select("draft_data").eq("slug", slug).single();
+  const { data, error: readErr } = await supabase
+    .from("pages").select("draft_data, title").eq("slug", slug).single();
   if (readErr || !data) throw new Error(`Page not found: ${slug}`);
   const { error } = await supabase
     .from("pages")
     .update({ published_data: data.draft_data, updated_by: profile.userId })
     .eq("slug", slug);
   if (error) throw new Error(error.message);
+
+  await supabase.from("page_versions").insert({
+    slug,
+    title: data.title,
+    data: data.draft_data,
+    created_by: profile.userId,
+  });
+  // Prune to the newest MAX_VERSIONS_PER_SLUG for this slug.
+  const { data: keep } = await supabase
+    .from("page_versions").select("id").eq("slug", slug)
+    .order("created_at", { ascending: false })
+    .range(0, MAX_VERSIONS_PER_SLUG - 1);
+  if (keep && keep.length === MAX_VERSIONS_PER_SLUG) {
+    const keepIds = keep.map((r) => r.id as string);
+    await supabase.from("page_versions").delete().eq("slug", slug)
+      .not("id", "in", `(${keepIds.join(",")})`);
+  }
+
   revalidatePath(slug === "home" ? "/" : `/${slug}`);
 }
 
@@ -60,4 +88,45 @@ export async function getPublishedPage(slug: string): Promise<PuckData | null> {
   const supabase = createAdminClient();
   const { data } = await supabase.from("pages").select("published_data").eq("slug", slug).maybeSingle();
   return (data?.published_data as PuckData) ?? null;
+}
+
+export async function listPageVersions(slug: string): Promise<PageVersion[]> {
+  await requireStaff();
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("page_versions")
+    .select("id, slug, title, created_at, created_by")
+    .eq("slug", slug)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  const rows = data ?? [];
+  const ids = [...new Set(rows.map((r) => r.created_by).filter(Boolean))] as string[];
+  const names = new Map<string, string>();
+  if (ids.length > 0) {
+    const { data: profs } = await supabase
+      .from("profiles").select("id, full_name, email").in("id", ids);
+    for (const p of profs ?? []) names.set(p.id as string, (p.full_name as string) || (p.email as string) || "");
+  }
+  return rows.map((r) => ({
+    id: r.id as string,
+    slug: r.slug as string,
+    title: r.title as string,
+    createdAt: r.created_at as string,
+    authorName: r.created_by ? names.get(r.created_by as string) ?? null : null,
+  }));
+}
+
+export async function restorePageVersion(id: string): Promise<{ slug: string }> {
+  const profile = await requireStaff();
+  const supabase = createAdminClient();
+  const { data: version, error: readErr } = await supabase
+    .from("page_versions").select("slug, data").eq("id", id).single();
+  if (readErr || !version) throw new Error("Version not found");
+  const { error } = await supabase
+    .from("pages")
+    .update({ draft_data: version.data, updated_by: profile.userId })
+    .eq("slug", version.slug);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/admin/pages/${version.slug}/edit`);
+  return { slug: version.slug as string };
 }
