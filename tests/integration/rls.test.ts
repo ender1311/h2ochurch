@@ -25,6 +25,7 @@ const TABLES = [
   "plan_assignments",
   "sermons",
   "pages",
+  "page_versions",
 ];
 
 describe.skipIf(!hasDbEnv())("RLS lockdown (anon key)", () => {
@@ -74,6 +75,14 @@ describe.skipIf(!hasDbEnv())("RLS lockdown (anon key)", () => {
     const { error } = await supabase.storage
       .from("site-assets")
       .upload(`anon-${Date.now()}.txt`, new Blob(["nope"]));
+    expect(error).toBeTruthy();
+  });
+
+  test("anon cannot insert into page_versions", async () => {
+    const supabase = anonClient();
+    const { error } = await supabase
+      .from("page_versions")
+      .insert({ slug: "x", title: "x", data: {} });
     expect(error).toBeTruthy();
   });
 });
