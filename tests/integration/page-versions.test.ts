@@ -51,12 +51,16 @@ describe.skipIf(!hasDbEnv())("page_versions (real database)", () => {
 
   // ── (b) list returns newest-first with createdAt + authorName shape ──────
   test("list returns rows newest-first with expected shape", async () => {
-    // Insert a second version (newer)
-    await sb.from("page_versions").insert({
-      slug,
-      title: "PV Test Page v2",
-      data: draft2,
-    });
+    // Use explicitly distinct created_at values so Postgres ordering is deterministic.
+    const olderTs = new Date(Date.now() - 2000).toISOString(); // 2 seconds ago
+    const newerTs = new Date(Date.now() - 1000).toISOString(); // 1 second ago
+
+    // Overwrite the row from test (a) with a controlled created_at, then add a second.
+    await sb.from("page_versions").delete().eq("slug", slug);
+    await sb.from("page_versions").insert([
+      { slug, title: "PV Test Page",    data: draft1, created_at: olderTs },
+      { slug, title: "PV Test Page v2", data: draft2, created_at: newerTs },
+    ]);
 
     const { data: rows } = await sb
       .from("page_versions")
@@ -67,9 +71,16 @@ describe.skipIf(!hasDbEnv())("page_versions (real database)", () => {
     expect(rows).toBeDefined();
     expect(rows!.length).toBeGreaterThanOrEqual(2);
 
-    // Newest first: the v2 row should come first (title contains "v2")
-    expect(rows![0].title).toBe("PV Test Page v2");
-    expect(rows![1].title).toBe("PV Test Page");
+    // Newest first: assert on created_at order, not title string order.
+    for (let i = 0; i < rows!.length - 1; i++) {
+      expect(new Date(rows![i].created_at).getTime()).toBeGreaterThanOrEqual(
+        new Date(rows![i + 1].created_at).getTime(),
+      );
+    }
+    // The row with newerTs should be first; the row with olderTs should be last.
+    // Postgres may return timestamps with '+00:00' suffix instead of 'Z'; compare as Date.
+    expect(new Date(rows![0].created_at).getTime()).toBe(new Date(newerTs).getTime());
+    expect(new Date(rows![rows!.length - 1].created_at).getTime()).toBe(new Date(olderTs).getTime());
 
     // Every row must have id, slug, title, created_at
     for (const row of rows!) {

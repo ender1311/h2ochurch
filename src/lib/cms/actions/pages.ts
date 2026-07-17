@@ -50,12 +50,13 @@ export async function publishPage(slug: string): Promise<void> {
     .eq("slug", slug);
   if (error) throw new Error(error.message);
 
-  await supabase.from("page_versions").insert({
+  const { error: snapErr } = await supabase.from("page_versions").insert({
     slug,
     title: data.title,
     data: data.draft_data,
     created_by: profile.userId,
   });
+  if (snapErr) throw new Error(snapErr.message);
   // Prune to the newest MAX_VERSIONS_PER_SLUG for this slug.
   const { data: keep } = await supabase
     .from("page_versions").select("id").eq("slug", slug)
