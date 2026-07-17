@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePuck } from "@measured/puck";
 import { savePageDraft } from "@/lib/cms/actions/pages";
+import { HistoryDrawer } from "./HistoryDrawer";
 
 export function EditorTopBar({ slug }: { slug: string }) {
   const router = useRouter();
@@ -10,6 +11,7 @@ export function EditorTopBar({ slug }: { slug: string }) {
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   async function handleSaveDraft() {
     setSaving(true);
@@ -72,15 +74,19 @@ export function EditorTopBar({ slug }: { slug: string }) {
 
       {error ? <span className="px-2 text-xs text-red-600">{error}</span> : null}
 
-      {/* TODO(task-6): wire this to the version-history drawer */}
       <button
         type="button"
-        disabled
-        className="rounded px-2 py-1 text-sm text-gray-400 cursor-not-allowed"
-        title="Version history — coming soon"
+        onClick={() => setHistoryOpen(true)}
+        className="rounded px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 hover:text-gray-900"
       >
         History
       </button>
+
+      <HistoryDrawer
+        slug={slug}
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+      />
     </div>
   );
 }
