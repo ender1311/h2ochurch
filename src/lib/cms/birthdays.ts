@@ -25,7 +25,7 @@ export function upcomingBirthdays(
   for (const p of people) {
     if (!p.birthdate) continue;
     const [y, m, d] = p.birthdate.split("-").map(Number);
-    if (!y || !m || !d) continue;
+    if (!y || !m || !d || m < 1 || m > 12 || d < 1 || d > 31) continue;
 
     for (const year of [startOfToday.getFullYear(), startOfToday.getFullYear() + 1]) {
       let next = new Date(year, m - 1, d);

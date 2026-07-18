@@ -1,5 +1,24 @@
 import { test, expect } from "bun:test";
-import { parsePeopleGroupsCsv, toCsv } from "../../src/lib/cms/csv";
+import { parsePeopleGroupsCsv, toCsv, escapeCsvCell } from "../../src/lib/cms/csv";
+
+test("escapeCsvCell neutralizes formula-injection prefixes", () => {
+  expect(escapeCsvCell("=SUM(A1:A9)")).toBe("'=SUM(A1:A9)");
+  expect(escapeCsvCell("+1234")).toBe("'+1234");
+  expect(escapeCsvCell("-1+1")).toBe("'-1+1");
+  expect(escapeCsvCell("@cmd")).toBe("'@cmd");
+  expect(escapeCsvCell("\tTabbed")).toBe("'\tTabbed");
+  expect(escapeCsvCell("Normal Name")).toBe("Normal Name");
+  expect(escapeCsvCell("a=b")).toBe("a=b");
+  expect(escapeCsvCell(42)).toBe(42);
+});
+
+test("toCsv escapes dangerous cells in output", () => {
+  const csv = toCsv([{ name: "=HYPERLINK(1)", note: "ok" }], [
+    { key: "name", label: "Name" },
+    { key: "note", label: "Note" },
+  ]);
+  expect(csv).toContain("'=HYPERLINK(1)");
+});
 
 test("parses people and splits pipe-delimited groups", () => {
   const csv = [

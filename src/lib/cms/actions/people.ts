@@ -41,7 +41,7 @@ export async function createPerson(fd: FormData) {
     .insert(personPayload(fd))
     .select("id")
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Could not save changes");
   revalidatePath("/admin/people");
   redirect(`/admin/people/${data.id}`);
 }
@@ -50,7 +50,7 @@ export async function updatePerson(id: string, fd: FormData) {
   await requireStaff();
   const supabase = createAdminClient();
   const { error } = await supabase.from("people").update(personPayload(fd)).eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Could not save changes");
   revalidatePath("/admin/people");
   revalidatePath(`/admin/people/${id}`);
   redirect(`/admin/people/${id}`);
@@ -60,7 +60,7 @@ export async function deletePerson(id: string) {
   await requireStaff();
   const supabase = createAdminClient();
   const { error } = await supabase.from("people").delete().eq("id", id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Could not save changes");
   revalidatePath("/admin/people");
   redirect("/admin/people");
 }
@@ -71,7 +71,7 @@ export async function createHousehold(fd: FormData) {
   if (!name) return;
   const supabase = createAdminClient();
   const { error } = await supabase.from("households").insert({ name });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Could not save changes");
   revalidatePath("/admin/people/households");
 }
 
@@ -92,7 +92,7 @@ export async function createFieldDefinition(fd: FormData) {
   const { error } = await supabase
     .from("field_definitions")
     .upsert({ key, label, kind }, { onConflict: "key" });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Could not save changes");
   revalidatePath("/admin/settings/fields");
 }
 

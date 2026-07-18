@@ -5,6 +5,9 @@ import { hasDbEnv, anonClient } from "./helpers";
 // publishable (anon) key. The app only reads server-side via the service role.
 const TABLES = [
   "people",
+  "group_types",
+  "field_definitions",
+  "person_field_values",
   "groups",
   "group_memberships",
   "group_join_requests",

@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     const result = await importPeopleGroups(supabase, csv, { dryRun: body.dryRun ?? false });
     return NextResponse.json({ data: result });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Import failed";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("CSV import failed", err);
+    return NextResponse.json({ error: "Import failed. Check the file format and try again." }, { status: 500 });
   }
 }

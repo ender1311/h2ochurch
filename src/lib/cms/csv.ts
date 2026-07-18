@@ -208,13 +208,21 @@ export async function importPeopleGroups(
   return result;
 }
 
+// Neutralize spreadsheet formula injection: a cell beginning with = + - @ (or a
+// leading tab/CR) is executed as a formula by Excel/Sheets. Prefix such values
+// with a single quote so they render as literal text.
+export function escapeCsvCell(value: unknown): unknown {
+  if (typeof value !== "string") return value;
+  return /^[=+\-@\t\r]/.test(value) ? `'${value}` : value;
+}
+
 export function toCsv<T extends Record<string, unknown>>(
   rows: T[],
   columns: { key: keyof T & string; label: string }[],
 ): string {
   const data = rows.map((r) => {
     const o: Record<string, unknown> = {};
-    for (const c of columns) o[c.label] = r[c.key] ?? "";
+    for (const c of columns) o[c.label] = escapeCsvCell(r[c.key] ?? "");
     return o;
   });
   return Papa.unparse(data, { columns: columns.map((c) => c.label) });

@@ -8,7 +8,9 @@ import { Logo } from "@/components/site/Logo";
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") ?? "/admin";
+  const rawNext = params.get("next") ?? "/admin";
+  // Prevent open redirect: only allow same-origin relative paths.
+  const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/admin";
   const forbidden = params.get("e") === "forbidden";
   const notice =
     params.get("signup") === "check-email"

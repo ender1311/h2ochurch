@@ -3,9 +3,12 @@
 import { redirect } from "next/navigation";
 import { getStripe } from "./stripe";
 import { siteUrl } from "@/lib/site";
+import { createAdminClient } from "@/utils/supabase/admin";
+
+const MAX_GIFT_DOLLARS = 100000;
 
 function str(fd: FormData, key: string): string {
-  return (fd.get(key) as string | null)?.trim() ?? "";
+  return ((fd.get(key) as string | null)?.trim() ?? "").slice(0, 200);
 }
 
 /** Public: start a Stripe Checkout session for an online gift. */
@@ -15,7 +18,16 @@ export async function startGivingCheckout(fd: FormData) {
 
   const amount = Number(str(fd, "amount"));
   if (!Number.isFinite(amount) || amount < 1) throw new Error("Enter a valid amount");
-  const fund = str(fd, "fund") || "General";
+  if (amount > MAX_GIFT_DOLLARS) throw new Error("Amount exceeds the online limit");
+
+  // Validate the fund against real funds so metadata can't carry an arbitrary
+  // label into donation records.
+  let fund = str(fd, "fund") || "General";
+  if (fund !== "General") {
+    const supabase = createAdminClient();
+    const { data: known } = await supabase.from("funds").select("name").eq("name", fund).maybeSingle();
+    if (!known) fund = "General";
+  }
   const email = str(fd, "email");
 
   const session = await stripe.checkout.sessions.create({

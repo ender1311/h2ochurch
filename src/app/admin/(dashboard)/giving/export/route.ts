@@ -47,6 +47,7 @@ export async function GET() {
     headers: {
       "content-type": "text/csv; charset=utf-8",
       "content-disposition": 'attachment; filename="h2o-giving-export.csv"',
+      "cache-control": "no-store, private",
     },
   });
 }

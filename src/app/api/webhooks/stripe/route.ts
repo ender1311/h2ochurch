@@ -25,6 +25,11 @@ export async function POST(request: Request) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
+    // Only fulfill once money is actually collected. Async methods can complete
+    // the session with payment_status "unpaid"/"no_payment_required".
+    if (session.payment_status !== "paid") {
+      return NextResponse.json({ received: true });
+    }
     const kind = session.metadata?.kind;
     const supabase = createAdminClient();
 
@@ -38,9 +43,10 @@ export async function POST(request: Request) {
         const { data } = await supabase.from("people").select("id").eq("email", email).maybeSingle();
         personId = data?.id ?? null;
       }
+      // Match an existing fund only — never create one from session metadata.
       const fundName = session.metadata?.fund;
       if (fundName && fundName !== "General") {
-        const { data } = await supabase.from("funds").upsert({ name: fundName }, { onConflict: "name" }).select("id").single();
+        const { data } = await supabase.from("funds").select("id").eq("name", fundName).maybeSingle();
         fundId = data?.id ?? null;
       }
 

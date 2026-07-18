@@ -45,7 +45,7 @@ export async function createJoinRequest(
     })
     .select("id")
     .single();
-  if (error || !data) throw new Error(error?.message ?? "Could not create request");
+  if (error || !data) throw new Error("Could not create request");
   return data.id;
 }
 
@@ -73,6 +73,18 @@ export async function approveJoinRequest(
     personId = data?.id ?? null;
   }
 
+  // Email-less request: fall back to an exact name match, but only when it is
+  // unambiguous — matching the wrong person is worse than creating a new one.
+  if (!personId && !r.email) {
+    const { data: matches } = await supabase
+      .from("people")
+      .select("id")
+      .eq("first_name", r.first_name)
+      .eq("last_name", r.last_name)
+      .limit(2);
+    if (matches && matches.length === 1) personId = matches[0].id as string;
+  }
+
   if (!personId) {
     const { data: created, error: insErr } = await supabase
       .from("people")
@@ -85,7 +97,7 @@ export async function approveJoinRequest(
       })
       .select("id")
       .single();
-    if (insErr || !created) throw new Error(insErr?.message ?? "Could not create person");
+    if (insErr || !created) throw new Error("Could not create person");
     personId = created.id as string;
   }
 
@@ -97,13 +109,13 @@ export async function approveJoinRequest(
       { group_id: r.group_id, person_id: personId, role: "member" },
       { onConflict: "group_id,person_id" },
     );
-  if (memErr) throw new Error(memErr.message);
+  if (memErr) throw new Error("Could not add group membership");
 
   const { error: updErr } = await supabase
     .from("group_join_requests")
     .update({ status: "approved", person_id: personId })
     .eq("id", requestId);
-  if (updErr) throw new Error(updErr.message);
+  if (updErr) throw new Error("Could not approve request");
 
   return personId;
 }
@@ -116,5 +128,5 @@ export async function declineJoinRequest(
     .from("group_join_requests")
     .update({ status: "declined" })
     .eq("id", requestId);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Could not decline request");
 }

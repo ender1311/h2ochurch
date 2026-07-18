@@ -14,7 +14,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const supabase = createAdminClient();
   const { data } = await supabase
     .from("event_registrations")
-    .select("*")
+    .select("first_name,last_name,email,phone,status,created_at")
     .eq("event_id", id)
     .order("created_at");
   const rows = (data ?? []) as EventRegistration[];
@@ -32,6 +32,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     headers: {
       "content-type": "text/csv; charset=utf-8",
       "content-disposition": 'attachment; filename="event-registrations.csv"',
+      "cache-control": "no-store, private",
     },
   });
 }

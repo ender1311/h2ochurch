@@ -34,7 +34,7 @@ export async function recordDonation(fd: FormData) {
     note: nullable(fd, "note"),
     donated_on: nullable(fd, "donated_on") ?? undefined,
   });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error("Could not save changes");
   revalidatePath("/admin/giving");
 }
 
