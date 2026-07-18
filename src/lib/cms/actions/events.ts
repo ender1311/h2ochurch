@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { requireStaff } from "@/lib/auth";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { slugify } from "@/lib/cms/slug";
-import { decideRegistrationStatus } from "@/lib/cms/registration";
+import { enforceRateLimit } from "@/lib/cms/rate-limit";
 
 const MAX_TEXT = 2000;
 
@@ -81,8 +81,16 @@ export async function setRegistrationStatus(eventId: string, registrationId: str
   revalidatePath(`/admin/events/${eventId}`);
 }
 
+type RegisterResult = {
+  registration_id: string;
+  status: string;
+  event_name: string;
+  cost_cents: number;
+};
+
 /** Public: register for an event from the signup page. No auth required. */
 export async function registerForEvent(eventId: string, slug: string, fd: FormData) {
+  await enforceRateLimit("register", 8, 3600);
   const supabase = createAdminClient();
   const first = str(fd, "first_name", 100);
   const last = str(fd, "last_name", 100);
@@ -101,66 +109,41 @@ export async function registerForEvent(eventId: string, slug: string, fd: FormDa
     personId = person?.id ?? null;
   }
 
-  // Capacity → waitlist behavior. visibility re-checked server-side so an
-  // unlisted event can't be registered for by guessing its id.
-  const [{ data: event }, { count: activeCount }] = await Promise.all([
-    supabase
-      .from("events")
-      .select("name, capacity, cost_cents, registration_open, visibility")
-      .eq("id", eventId)
-      .single(),
-    supabase
-      .from("event_registrations")
-      .select("*", { count: "exact", head: true })
-      .eq("event_id", eventId)
-      .neq("status", "cancelled"),
-  ]);
-  if (!event || event.visibility !== "listed") throw new Error("Event not found");
-  if (!event.registration_open) throw new Error("Registration is closed");
-
-  // Block obvious double-registration by the same email for this event.
-  if (email) {
-    const { data: existing } = await supabase
-      .from("event_registrations")
-      .select("id")
-      .eq("event_id", eventId)
-      .eq("email", email.toLowerCase())
-      .neq("status", "cancelled")
-      .limit(1);
-    if (existing && existing.length > 0) throw new Error("You're already registered for this event");
+  // Capacity check + insert happen atomically in one advisory-locked transaction
+  // (register_for_event) so concurrent signups can't exceed capacity. The RPC
+  // also re-checks visibility/open status and blocks duplicate emails.
+  const { data, error } = await supabase.rpc("register_for_event", {
+    p_event_id: eventId,
+    p_person_id: personId,
+    p_first_name: first,
+    p_last_name: last,
+    p_email: email?.toLowerCase() ?? null,
+    p_phone: nullable(fd, "phone"),
+    p_notes: str(fd, "notes"),
+  });
+  if (error) {
+    const m = error.message ?? "";
+    if (m.includes("EVENT_NOT_FOUND")) throw new Error("Event not found");
+    if (m.includes("REGISTRATION_CLOSED")) throw new Error("Registration is closed");
+    if (m.includes("ALREADY_REGISTERED")) throw new Error("You're already registered for this event");
+    throw new Error("Registration failed");
   }
-
-  const status = decideRegistrationStatus(event.capacity, activeCount ?? 0);
-
-  const { data: registration, error } = await supabase
-    .from("event_registrations")
-    .insert({
-      event_id: eventId,
-      person_id: personId,
-      first_name: first,
-      last_name: last,
-      email: email?.toLowerCase() ?? null,
-      phone: nullable(fd, "phone"),
-      responses: { notes: str(fd, "notes") },
-      status,
-    })
-    .select("id")
-    .single();
-  if (error || !registration) throw new Error("Registration failed");
+  const row = (Array.isArray(data) ? data[0] : data) as RegisterResult | undefined;
+  if (!row) throw new Error("Registration failed");
   revalidatePath(`/admin/events/${eventId}`);
 
   // Paid event → hand off to Stripe Checkout (skipped for waitlist or when unconfigured).
-  if (event.cost_cents > 0 && status === "registered") {
+  if (row.cost_cents > 0 && row.status === "registered") {
     const { startRegistrationCheckout } = await import("@/lib/payments/checkout");
     const url = await startRegistrationCheckout({
-      registrationId: registration.id,
-      eventName: event.name,
+      registrationId: row.registration_id,
+      eventName: row.event_name,
       slug,
-      costCents: event.cost_cents,
+      costCents: row.cost_cents,
       email: email?.toLowerCase() ?? null,
     });
     if (url) redirect(url);
   }
 
-  redirect(`/events/${slug}?registered=${status === "waitlisted" ? "waitlist" : "1"}`);
+  redirect(`/events/${slug}?registered=${row.status === "waitlisted" ? "waitlist" : "1"}`);
 }

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getStripe } from "./stripe";
 import { siteUrl } from "@/lib/site";
 import { createAdminClient } from "@/utils/supabase/admin";
+import { enforceRateLimit } from "@/lib/cms/rate-limit";
 
 const MAX_GIFT_DOLLARS = 100000;
 
@@ -13,6 +14,7 @@ function str(fd: FormData, key: string): string {
 
 /** Public: start a Stripe Checkout session for an online gift. */
 export async function startGivingCheckout(fd: FormData) {
+  await enforceRateLimit("give", 12, 3600);
   const stripe = getStripe();
   if (!stripe) throw new Error("Online giving is not configured yet");
 
