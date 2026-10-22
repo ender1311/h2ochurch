@@ -99,6 +99,12 @@ saved as feedback memories) and "the plan / todo list" is the harness task list
 - Name things for what they represent, not how they're implemented.
 - Don't add error handling for impossible paths — trust the type system and invariants.
 
+## Live WordPress site
+
+The current public site (h2ocolumbus.org) is a separate WordPress install edited via
+its REST API. See `docs/wordpress-site.md` for access, gotchas, and the change log —
+update its change log whenever we change the live site.
+
 ## Deployment
 
 - Hosted on Vercel (`framework: nextjs`).
